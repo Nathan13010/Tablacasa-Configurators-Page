@@ -48,71 +48,31 @@
 
         .configurator {
             margin-top: 40px;
+            position: relative;
+            /* Pour positionner le bouton par rapport à cette zone */
         }
 
-        .dropdown {
-            margin: 10px 0;
+        iframe {
+            border: 1px solid #929292;
+            background-color: white;
+            width: 100%;
+            height: 500px;
+            /* Hauteur par défaut */
         }
 
-        .link-display {
-            margin-top: 10px;
-        }
-
-        button.copy-btn {
-            margin-left: 10px;
-        }
-
-        .config-controls {
-            font-size: 20px;
-            background: #fff;
-            border: 2px solid #333;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-
-        }
-
-        .config-controls label,
-        .config-controls select,
-        .config-controls input,
-        .config-controls button {
-            font-size: 20px;
-            padding: 8px;
-            margin: 5px 0;
-        }
-
-        button.copy-btn {
-            font-size: 20px;
-            padding: 8px 16px;
-        }
-
-        #copyAlert {
-            position: fixed;
-            /* Pour centrer dans la page : */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-
-            background: #4CAF50;
-            /* Couleur de fond verte */
+        /* Bouton plein écran */
+        #fullscreenBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.5);
             color: #fff;
-            padding: 15px 30px;
-            border-radius: 8px;
+            border: none;
             font-size: 24px;
-            text-align: center;
-            z-index: 9999;
-            /* Au-dessus des autres éléments */
-
-            opacity: 0;
-            /* Masqué par défaut */
-            transition: opacity 0.5s ease;
-            /* Transition douce */
-        }
-
-        /* Classe pour afficher l'alerte avec une opacité 1 */
-        #copyAlert.show {
-            opacity: 1;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -289,126 +249,71 @@
             </div>
         </div>
 
-        <!-- Section de configuration du configurateur -->
         <div class="configurator" id="configuratorSection" style="display:none;">
             <h2>Visualisation du configurateur</h2>
-
-            <!-- Nouveau conteneur pour les contrôles, mis en valeur -->
-            <div class="config-controls">
-                <!-- Menu déroulant pour choisir le coefficient -->
-                <div class="dropdown">
-                    <label for="coefSelect">Sélectionnez votre coefficient :</label>
-                    <select id="coefSelect">
-                        <option value="">-- Choisir --</option>
-                        <option value="2.2">Promo 2,2</option>
-                        <option value="2.5">Magasin 2,5</option>
-                        <option value="2.8">Magasin 2,8</option>
-                        <option value="3">Foire 3</option>
-                        <option value="3.5">Foire 3,5</option>
-                        <option value="custom">Coefficient personnalisé</option>
-                        <option value="hideprice">Cacher les informations</option>
-                    </select>
-                    <!-- Champ pour saisir un coefficient personnalisé -->
-                    <input type="number" id="customCoef" placeholder="Entrez votre coefficient" step="0.1"
-                        style="display:none; margin-top:10px;">
-                </div>
-
-                <!-- Affichage du lien généré -->
-                <div class="link-display">
-                    <label for="generatedLink">Lien généré :</label>
-                    <input type="text" id="generatedLink" readonly style="width:80%;">
-                    <button class="copy-btn" id="copyBtn">Copier</button>
-                </div>
-            </div>
-
-            <!-- Aperçu du configurateur -->
-            <iframe id="configuratorFrame" src="" width="100%" height="500"
-                style="border:1px solid #929292; background-color: white;"></iframe>
+            <!-- Bouton plein écran / sortie -->
+            <button id="fullscreenBtn">⛶</button>
+            <iframe id="configuratorFrame" src=""></iframe>
         </div>
-
-        <div id="copyAlert" class="copy-alert">Copié !</div>
-
     </div>
+
 
     <script>
         // Récupération des éléments du DOM
         const productCards = document.querySelectorAll('.product-card');
         const configuratorSection = document.getElementById('configuratorSection');
         const configuratorFrame = document.getElementById('configuratorFrame');
-        const coefSelect = document.getElementById('coefSelect');
-        const customCoefInput = document.getElementById('customCoef');
-        const generatedLinkInput = document.getElementById('generatedLink');
-        const copyBtn = document.getElementById('copyBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const configuratorTitle = document.querySelector('#configuratorSection h2');
 
-        let baseUrl = ""; // URL de base du configurateur sélectionné
+        // Récupérer les paramètres passés à la page (ex: ?coef=2.5, ?hideprice, etc.)
+        const pageQuery = window.location.search;
 
-        // Fonction de mise à jour du configurateur et du lien généré
-        function updateConfigurator() {
-            let selectedValue = coefSelect.value;
-            let updatedUrl = baseUrl;
-
-            if (selectedValue === "custom") {
-                const customValue = customCoefInput.value;
-                if (customValue) {
-                    updatedUrl += "?coef=" + customValue;
-                }
-            } else if (selectedValue === "hideprice") {
-                updatedUrl += "?hideprice";
-            } else if (selectedValue) {
-                updatedUrl += "?coef=" + selectedValue;
-            }
-
-            configuratorFrame.src = updatedUrl;
-            generatedLinkInput.value = updatedUrl;
-        }
-
-        // Lorsqu'un produit est cliqué, afficher la section configurateur avec le lien de base
+        // Lorsqu'un produit est cliqué, on construit l'URL finale en y ajoutant les paramètres de la page
         productCards.forEach(card => {
             card.addEventListener('click', () => {
-                baseUrl = card.getAttribute('data-link');
+                const baseLink = card.getAttribute('data-link');
+                let finalUrl = baseLink;
+                if (pageQuery) {
+                    finalUrl += pageQuery;
+                }
+                // Afficher la section configurateur et charger l'URL dans l'iframe
                 configuratorSection.style.display = 'block';
-                // Réinitialiser la sélection
-                coefSelect.value = "";
-                customCoefInput.style.display = 'none';
-                customCoefInput.value = "";
-                // Mettre à jour l'iframe avec la base URL
-                configuratorFrame.src = baseUrl;
-                generatedLinkInput.value = baseUrl;
-                // Défilement vers la section du configurateur
+                configuratorFrame.src = finalUrl;
                 configuratorSection.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Affichage du champ personnalisé si l'option correspondante est sélectionnée
-        coefSelect.addEventListener('change', () => {
-            if (coefSelect.value === "custom") {
-                customCoefInput.style.display = 'inline-block';
+        // Gestion du mode plein écran via le Fullscreen API
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                // Passer en mode plein écran pour la section configurateur
+                configuratorSection.requestFullscreen().catch(err => {
+                    console.error("Erreur lors de la demande du plein écran: ", err);
+                });
             } else {
-                customCoefInput.style.display = 'none';
-                updateConfigurator();
+                document.exitFullscreen();
             }
         });
 
-        // Mise à jour en temps réel lorsque l'utilisateur saisit un coefficient personnalisé
-        customCoefInput.addEventListener('input', () => {
-            updateConfigurator();
+        // Changement du texte du bouton, des dimensions de l'iframe et affichage du titre selon l'état plein écran
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = "×"; // Affiche une croix pour quitter
+                configuratorTitle.style.display = 'none'; // Masquer le titre
+                // Redimensionner l'iframe en mode plein écran
+                configuratorFrame.style.width = "100%";
+                configuratorFrame.style.height = "100%";
+            } else {
+                fullscreenBtn.textContent = "⛶"; // Affiche l'icône plein écran
+                configuratorTitle.style.display = 'block'; // Réafficher le titre
+                // Revenir aux dimensions par défaut
+                configuratorFrame.style.width = "100%";
+                configuratorFrame.style.height = "500px";
+            }
         });
-
-        // Bouton pour copier le lien généré
-        copyBtn.addEventListener('click', () => {
-            generatedLinkInput.select();
-            document.execCommand('copy');
-
-            // Afficher le message "Copié !" au milieu
-            copyAlert.classList.add('show');
-
-            // Le masquer après 1,5 seconde
-            setTimeout(() => {
-                copyAlert.classList.remove('show');
-            }, 1500);
-        });
-
     </script>
+
 </body>
 
 </html>
