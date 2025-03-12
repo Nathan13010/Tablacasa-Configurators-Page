@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Configurateurs 3D Tablacasa</title>
+    <style>
+        /* Styles de base */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .configurator {
+            margin-top: 40px;
+        }
+
+        .dropdown {
+            margin: 10px 0;
+        }
+
+        .link-display {
+            margin-top: 10px;
+        }
+
+        button.copy-btn {
+            margin-left: 10px;
+        }
+
+        .config-controls {
+            font-size: 20px;
+            background: #fff;
+            border: 2px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+        }
+
+        .config-controls label,
+        .config-controls select,
+        .config-controls input,
+        .config-controls button {
+            font-size: 20px;
+            padding: 8px;
+            margin: 5px 0;
+        }
+
+        button.copy-btn {
+            font-size: 20px;
+            padding: 8px 16px;
+        }
+
+        #copyAlert {
+            position: fixed;
+            /* Pour centrer dans la page : */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            background: #4CAF50;
+            /* Couleur de fond verte */
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 24px;
+            text-align: center;
+            z-index: 9999;
+            /* Au-dessus des autres éléments */
+
+            opacity: 0;
+            /* Masqué par défaut */
+            transition: opacity 0.5s ease;
+            /* Transition douce */
+        }
+
+        /* Classe pour afficher l'alerte avec une opacité 1 */
+        #copyAlert.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Configurateurs 3D Tablacasa</h1>
+
+        <!-- Section Chaises -->
+        <div class="category" id="chaises">
+            <h2>Chaises</h2>
+            <div class="product-grid">
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Adeline - API/Tablacasa-Chaise-Adeline.html">
+                    <img src="/media/Adeline_Chair.jpg" alt="Adeline">
+                    <p>Adeline</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Alice - API/Tablacasa-Chaise-Alice.html">
+                    <img src="/media/Alice_Chair.jpg" alt="Alice">
+                    <p>Alice</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Buna - API/Tablacasa-Chaise-Buna.html">
+                    <img src="/media/Buna_Chair.jpg" alt="Buna">
+                    <p>Buna</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Calisson - API/Tablacasa-Chaise-Calisson.html">
+                    <img src="/media/Calisson_chair.jpg" alt="Calisson">
+                    <p>Calisson</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Carly - API/Tablacasa-Chaise-Carly.html">
+                    <img src="/media/Carly_Chair.jpg" alt="Carly">
+                    <p>Carly</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Fast - API/Tablacasa-Chaise-Fast.html">
+                    <img src="/media/Fast_chair.jpg" alt="Fast">
+                    <p>Fast</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Fugace - API/Tablacasa-Chaise-Fugace.html">
+                    <img src="/media/fugace_chair.jpg" alt="Fugace">
+                    <p>Fugace</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Furtif - API/Tablacasa-Chaise-Furtif.html">
+                    <img src="/media/Furtif_Chair.jpg" alt="Furtif">
+                    <p>Furtif</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Hello - API/Tablacasa-Chaise-Hello.html">
+                    <img src="/media/Hello_Chair.jpg" alt="Hello">
+                    <p>Hello</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Hola - API/Tablacasa-Chaise-Hola.html">
+                    <img src="/media/Hola_chair.jpg" alt="Hola">
+                    <p>Hola</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Linky%20-%20API/Tablacasa-Chaise-Linky.html">
+                    <img src="/media/Linky_Chair.jpg" alt="Linky">
+                    <p>Linky</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Lutece%20-%20API/Tablacasa-Chaise-Lutece.html">
+                    <img src="/media/Lutece_Chair.jpg" alt="Lutece">
+                    <p>Lutece</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Melody%20-%20API/Tablacasa-Chaise-Melody.html">
+                    <img src="/media/Melody_Chair.jpg" alt="Melody">
+                    <p>Melody</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Paris%20-%20API/Tablacasa-Chaise-Paris.html">
+                    <img src="/media/Paris_Chair.jpg" alt="Paris">
+                    <p>Paris</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Perla%20-%20API/Tablacasa-Chaise-Perla.html">
+                    <img src="/media/Perla_Chair.jpg" alt="Perla">
+                    <p>Perla</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Tampico%20-%20API/Tablacasa-Chaise-Tampico.html">
+                    <img src="/media/Tampico_Chair.jpg" alt="Tampico">
+                    <p>Tampico</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Chaise-Twist%20-%20API/Tablacasa-Chaise-Twist.html">
+                    <img src="/media/Twist_Chair.jpg" alt="Twist">
+                    <p>Twist</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Fauteils -->
+        <div class="category" id="fauteils">
+            <h2>Fauteils</h2>
+            <div class="product-grid">
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Fauteil-Coco%20-%20API/Tablacasa-Chaise-Coco.html">
+                    <img src="/media/Coco_Chair.jpg" alt="Coco">
+                    <p>Coco</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Fauteil-Mistral%20-%20API/Tablacasa-Chaise-Mistral.html">
+                    <img src="/media/Mistral_Chair.png" alt="Mistral">
+                    <p>Mistral</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Fauteil-Sirocco%20-%20API/Tablacasa-Chaise-Sirocco.html">
+                    <img src="/media/Sirocco_Chair.png" alt="Sirocco">
+                    <p>Sirocco</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Fauteil-Zephyr%20-%20API/Tablacasa-Chaise-Zephyr.html">
+                    <img src="/media/Zephyr_Chair.jpg" alt="Zéphyr">
+                    <p>Zéphyr</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Tabouret de bar -->
+        <div class="category" id="tabourets">
+            <h2>Tabouret de bar</h2>
+            <div class="product-grid">
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Tabouret-Fugace%20-%20API/Tablacasa-Tabouret-Fugace.html">
+                    <img src="/media/Fugace_bar.jpg" alt="Fugace">
+                    <p>Fugace</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Tabouret-Furtif%20-%20API/Tablacasa-Tabouret-Furtif.html">
+                    <img src="/media/Furtif_bar.jpg" alt="Furtif">
+                    <p>Furtif</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Tabouret-Hello%20-%20API/Tablacasa-Tabouret-Hello.html">
+                    <img src="/media/Hello_bar.jpg" alt="Hello">
+                    <p>Hello</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Tablacasa-Tabouret-Hola%20-%20API/Tablacasa-Tabouret-Hola.html">
+                    <img src="/media/Hola_bar.jpg" alt="Hola">
+                    <p>Hola</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Concept Table -->
+        <div class="category" id="concepts">
+            <h2>Concept Table</h2>
+            <div class="product-grid">
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Concept%20Table%201%20-%20API/Concept%20Table%201.html">
+                    <img src="/media/concept_table_1.png" alt="Concept Table 1">
+                    <p>Concept Table 1</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Concept%20Table%202%20-%20API/Concept%20Table%202.html">
+                    <img src="/media/concept_table_2.png" alt="Concept Table 2">
+                    <p>Concept Table 2</p>
+                </div>
+                <div class="product-card"
+                    data-link="https://cdn.soft8soft.com/AROAJSY2GOEHMOFUVPIOE:e577ee4a7d/Concept%20Table%20Basse%20-%20API/Concept%20Table%20Basse.html">
+                    <img src="/media/concept_table_basse.png" alt="Concept Table Basse">
+                    <p>Concept Table Basse</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section de configuration du configurateur -->
+        <div class="configurator" id="configuratorSection" style="display:none;">
+            <h2>Visualisation du configurateur</h2>
+
+            <!-- Nouveau conteneur pour les contrôles, mis en valeur -->
+            <div class="config-controls">
+                <!-- Menu déroulant pour choisir le coefficient -->
+                <div class="dropdown">
+                    <label for="coefSelect">Sélectionnez votre coefficient :</label>
+                    <select id="coefSelect">
+                        <option value="">-- Choisir --</option>
+                        <option value="2.2">Promo 2,2</option>
+                        <option value="2.5">Magasin 2,5</option>
+                        <option value="2.8">Magasin 2,8</option>
+                        <option value="3">Foire 3</option>
+                        <option value="3.5">Foire 3,5</option>
+                        <option value="custom">Coefficient personnalisé</option>
+                        <option value="hideprice">Cacher les informations</option>
+                    </select>
+                    <!-- Champ pour saisir un coefficient personnalisé -->
+                    <input type="number" id="customCoef" placeholder="Entrez votre coefficient" step="0.1"
+                        style="display:none; margin-top:10px;">
+                </div>
+
+                <!-- Affichage du lien généré -->
+                <div class="link-display">
+                    <label for="generatedLink">Lien généré :</label>
+                    <input type="text" id="generatedLink" readonly style="width:80%;">
+                    <button class="copy-btn" id="copyBtn">Copier</button>
+                </div>
+            </div>
+
+            <!-- Aperçu du configurateur -->
+            <iframe id="configuratorFrame" src="" width="100%" height="500"
+                style="border:1px solid #929292; background-color: white;"></iframe>
+        </div>
+
+        <div id="copyAlert" class="copy-alert">Copié !</div>
+
+    </div>
+
+    <script>
+        // Récupération des éléments du DOM
+        const productCards = document.querySelectorAll('.product-card');
+        const configuratorSection = document.getElementById('configuratorSection');
+        const configuratorFrame = document.getElementById('configuratorFrame');
+        const coefSelect = document.getElementById('coefSelect');
+        const customCoefInput = document.getElementById('customCoef');
+        const generatedLinkInput = document.getElementById('generatedLink');
+        const copyBtn = document.getElementById('copyBtn');
+
+        let baseUrl = ""; // URL de base du configurateur sélectionné
+
+        // Fonction de mise à jour du configurateur et du lien généré
+        function updateConfigurator() {
+            let selectedValue = coefSelect.value;
+            let updatedUrl = baseUrl;
+
+            if (selectedValue === "custom") {
+                const customValue = customCoefInput.value;
+                if (customValue) {
+                    updatedUrl += "?coef=" + customValue;
+                }
+            } else if (selectedValue === "hideprice") {
+                updatedUrl += "?hideprice";
+            } else if (selectedValue) {
+                updatedUrl += "?coef=" + selectedValue;
+            }
+
+            configuratorFrame.src = updatedUrl;
+            generatedLinkInput.value = updatedUrl;
+        }
+
+        // Lorsqu'un produit est cliqué, afficher la section configurateur avec le lien de base
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                baseUrl = card.getAttribute('data-link');
+                configuratorSection.style.display = 'block';
+                // Réinitialiser la sélection
+                coefSelect.value = "";
+                customCoefInput.style.display = 'none';
+                customCoefInput.value = "";
+                // Mettre à jour l'iframe avec la base URL
+                configuratorFrame.src = baseUrl;
+                generatedLinkInput.value = baseUrl;
+                // Défilement vers la section du configurateur
+                configuratorSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Affichage du champ personnalisé si l'option correspondante est sélectionnée
+        coefSelect.addEventListener('change', () => {
+            if (coefSelect.value === "custom") {
+                customCoefInput.style.display = 'inline-block';
+            } else {
+                customCoefInput.style.display = 'none';
+                updateConfigurator();
+            }
+        });
+
+        // Mise à jour en temps réel lorsque l'utilisateur saisit un coefficient personnalisé
+        customCoefInput.addEventListener('input', () => {
+            updateConfigurator();
+        });
+
+        // Bouton pour copier le lien généré
+        copyBtn.addEventListener('click', () => {
+            generatedLinkInput.select();
+            document.execCommand('copy');
+
+            // Afficher le message "Copié !" au milieu
+            copyAlert.classList.add('show');
+
+            // Le masquer après 1,5 seconde
+            setTimeout(() => {
+                copyAlert.classList.remove('show');
+            }, 1500);
+        });
+
+    </script>
+</body>
+
+</html>
