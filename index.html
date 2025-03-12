@@ -49,7 +49,7 @@
         .configurator {
             margin-top: 40px;
             position: relative;
-            /* Pour positionner le bouton par rapport à cette zone */
+            /* Pour positionner le bouton dans ce conteneur */
         }
 
         iframe {
@@ -73,6 +73,19 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 4px;
+        }
+
+        /* Classe pour simuler le plein écran sur mobile */
+        .fullscreen-simulated {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 9999;
+            background: #fff;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
@@ -250,7 +263,7 @@
         </div>
 
         <div class="configurator" id="configuratorSection" style="display:none;">
-            <h2>Visualisation du configurateur</h2>
+            <h2 id="configTitle">Visualisation du configurateur</h2>
             <!-- Bouton plein écran / sortie -->
             <button id="fullscreenBtn">⛶</button>
             <iframe id="configuratorFrame" src=""></iframe>
@@ -264,12 +277,12 @@
         const configuratorSection = document.getElementById('configuratorSection');
         const configuratorFrame = document.getElementById('configuratorFrame');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const configuratorTitle = document.querySelector('#configuratorSection h2');
+        const configTitle = document.getElementById('configTitle');
 
-        // Récupérer les paramètres passés à la page (ex: ?coef=2.5, ?hideprice, etc.)
+        // Récupérer les paramètres de l'URL de la page
         const pageQuery = window.location.search;
 
-        // Lorsqu'un produit est cliqué, on construit l'URL finale en y ajoutant les paramètres de la page
+        // Lorsqu'un produit est cliqué, on construit l'URL finale
         productCards.forEach(card => {
             card.addEventListener('click', () => {
                 const baseLink = card.getAttribute('data-link');
@@ -277,38 +290,72 @@
                 if (pageQuery) {
                     finalUrl += pageQuery;
                 }
-                // Afficher la section configurateur et charger l'URL dans l'iframe
                 configuratorSection.style.display = 'block';
                 configuratorFrame.src = finalUrl;
                 configuratorSection.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Gestion du mode plein écran via le Fullscreen API
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                // Passer en mode plein écran pour la section configurateur
-                configuratorSection.requestFullscreen().catch(err => {
-                    console.error("Erreur lors de la demande du plein écran: ", err);
-                });
+        // Fonction pour demander le plein écran avec préfixes ou simuler le plein écran
+        function enterFullScreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
             } else {
+                // Si aucune API n'est disponible, simuler avec une classe CSS
+                element.classList.add('fullscreen-simulated');
+                // Masquer le titre pour libérer de l'espace
+                configTitle.style.display = 'none';
+                // Redimensionner l'iframe
+                configuratorFrame.style.width = "100%";
+                configuratorFrame.style.height = "100%";
+                fullscreenBtn.textContent = "×";
+            }
+        }
+
+        function exitFullScreen() {
+            if (document.exitFullscreen) {
                 document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else {
+                // Supprimer la simulation de plein écran
+                configuratorSection.classList.remove('fullscreen-simulated');
+                configTitle.style.display = 'block';
+                configuratorFrame.style.height = "500px";
+                fullscreenBtn.textContent = "⛶";
+            }
+        }
+
+        // Bouton de bascule pour le plein écran
+        fullscreenBtn.addEventListener('click', () => {
+            // Si on est déjà en plein écran (natif ou simulé), on quitte
+            if (document.fullscreenElement || configuratorSection.classList.contains('fullscreen-simulated')) {
+                exitFullScreen();
+            } else {
+                enterFullScreen(configuratorSection);
             }
         });
 
-        // Changement du texte du bouton, des dimensions de l'iframe et affichage du titre selon l'état plein écran
+        // Gérer les changements de plein écran avec la Fullscreen API native
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
-                fullscreenBtn.textContent = "×"; // Affiche une croix pour quitter
-                configuratorTitle.style.display = 'none'; // Masquer le titre
-                // Redimensionner l'iframe en mode plein écran
+                fullscreenBtn.textContent = "×";
+                configTitle.style.display = 'none';
                 configuratorFrame.style.width = "100%";
                 configuratorFrame.style.height = "100%";
             } else {
-                fullscreenBtn.textContent = "⛶"; // Affiche l'icône plein écran
-                configuratorTitle.style.display = 'block'; // Réafficher le titre
-                // Revenir aux dimensions par défaut
-                configuratorFrame.style.width = "100%";
+                fullscreenBtn.textContent = "⛶";
+                configTitle.style.display = 'block';
                 configuratorFrame.style.height = "500px";
             }
         });
