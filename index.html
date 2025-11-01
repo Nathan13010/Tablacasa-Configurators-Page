@@ -328,6 +328,47 @@
 
 
     <script>
+        // Clé pour le localStorage DE CETTE PAGE (le parent)
+        const MAIN_COEF_KEY = 'ar_main_page_coefficient';
+        let activeCoefficient = 1; // Coefficient par défaut en mémoire
+
+        // 1. Lire le coef de l'URL principale, le stocker, et nettoyer l'URL
+        function initializeCoefficient() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlCoef = urlParams.get("coef");
+
+            if (urlCoef) {
+                // Cas 1: ?coef= est dans l'URL principale
+                let coefValue = parseFloat(urlCoef);
+                if (isNaN(coefValue)) {
+                    coefValue = 1;
+                }
+                activeCoefficient = coefValue; // Stocke dans la variable
+                localStorage.setItem(MAIN_COEF_KEY, activeCoefficient); // Stocke pour les rechargements
+
+                console.log(`Coefficient ${activeCoefficient} lu depuis l'URL principale.`);
+
+                // Nettoyer l'URL de la page principale (conserve les ancres #)
+                if (window.history.replaceState) {
+                    const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+                    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+                }
+            } else {
+                // Cas 2: Pas de coef dans l'URL (ex: rechargement de la page)
+                const storedCoef = localStorage.getItem(MAIN_COEF_KEY);
+                if (storedCoef) {
+                    activeCoefficient = parseFloat(storedCoef);
+                    console.log(`Coefficient ${activeCoefficient} lu depuis le stockage principal.`);
+                }
+            }
+        }
+
+        // <--- APPEL IMMÉDIAT
+        initializeCoefficient();
+
+
+        // --- Le reste de votre script ---
+
         // Récupération des éléments du DOM
         const productCards = document.querySelectorAll('.product-card');
         const configuratorSection = document.getElementById('configuratorSection');
@@ -335,24 +376,29 @@
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const configTitle = document.getElementById('configTitle');
 
-        // Récupérer les paramètres de l'URL de la page
-        const pageQuery = window.location.search;
-
-        // Lorsqu'un produit est cliqué, on construit l'URL finale
+        // <--- MODIFIÉ : Clic sur le produit
         productCards.forEach(card => {
             card.addEventListener('click', () => {
                 const baseLink = card.getAttribute('data-link');
                 let finalUrl = baseLink;
-                if (pageQuery) {
-                    finalUrl += pageQuery;
+
+                // <--- LOGIQUE AJOUTÉE : Ajoute le coef à l'URL de l'iframe
+                if (activeCoefficient !== 1) {
+                    // Vérifie si le lien de base a déjà des paramètres
+                    const separator = baseLink.includes('?') ? '&' : '?';
+                    finalUrl = `${baseLink}${separator}coef=${activeCoefficient}`;
                 }
+
+                console.log("Chargement de l'iframe avec l'URL:", finalUrl);
+
                 configuratorSection.style.display = 'block';
                 configuratorFrame.src = finalUrl;
                 configuratorSection.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Fonction pour demander le plein écran avec préfixes ou simuler le plein écran
+        // --- Reste du script (Plein écran, Tri) ---
+
         function enterFullScreen(element) {
             if (element.requestFullscreen) {
                 element.requestFullscreen();
@@ -363,11 +409,8 @@
             } else if (element.msRequestFullscreen) {
                 element.msRequestFullscreen();
             } else {
-                // Si aucune API n'est disponible, simuler avec une classe CSS
                 element.classList.add('fullscreen-simulated');
-                // Masquer le titre pour libérer de l'espace
                 configTitle.style.display = 'none';
-                // Redimensionner l'iframe
                 configuratorFrame.style.width = "100%";
                 configuratorFrame.style.height = "100%";
                 fullscreenBtn.textContent = "×";
@@ -384,7 +427,6 @@
             } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
             } else {
-                // Supprimer la simulation de plein écran
                 configuratorSection.classList.remove('fullscreen-simulated');
                 configTitle.style.display = 'block';
                 configuratorFrame.style.height = "500px";
@@ -392,9 +434,7 @@
             }
         }
 
-        // Bouton de bascule pour le plein écran
         fullscreenBtn.addEventListener('click', () => {
-            // Si on est déjà en plein écran (natif ou simulé), on quitte
             if (document.fullscreenElement || configuratorSection.classList.contains('fullscreen-simulated')) {
                 exitFullScreen();
             } else {
@@ -402,7 +442,6 @@
             }
         });
 
-        // Gérer les changements de plein écran avec la Fullscreen API native
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
                 fullscreenBtn.textContent = "×";
@@ -416,28 +455,19 @@
             }
         });
 
-        // Fonction pour trier les produits dans chaque catégorie
         function sortCategoriesAlphabetically() {
-            // Récupérer toutes les grilles de produits
             const productGrids = document.querySelectorAll('.product-grid');
-
             productGrids.forEach(grid => {
-                // Convertir les enfants de la grille en tableau pour pouvoir les trier
                 const productCards = Array.from(grid.children);
-
-                // Trier les cartes produits par ordre alphabétique (basé sur le texte dans <p>)
                 productCards.sort((a, b) => {
                     const nameA = a.querySelector('p').textContent.toLowerCase();
                     const nameB = b.querySelector('p').textContent.toLowerCase();
                     return nameA.localeCompare(nameB);
                 });
-
-                // Réinsérer les cartes triées dans la grille
                 productCards.forEach(card => grid.appendChild(card));
             });
         }
 
-        // Appeler la fonction pour trier les catégories au chargement de la page
         document.addEventListener('DOMContentLoaded', sortCategoriesAlphabetically);
     </script>
 
