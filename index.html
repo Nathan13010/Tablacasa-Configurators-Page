@@ -328,6 +328,41 @@
 
 
     <script>
+        // <-- NOUVEAU : Définir la clé de stockage (doit être LA MÊME que dans apiHandler.js)
+        const COEF_KEY = 'ar_production_price_coefficient';
+
+        // <-- NOUVEAU : Fonction pour lire le coef de l'URL, le stocker et nettoyer l'URL
+        function initializeCoefficient() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlCoef = urlParams.get("coef");
+
+            if (urlCoef) {
+                // Un coefficient est présent dans l'URL de la page principale
+                let coefValue = parseFloat(urlCoef);
+                if (isNaN(coefValue)) {
+                    coefValue = 1;
+                }
+
+                // 1. Stocker la valeur dans le localStorage (l'iframe lira cette valeur)
+                localStorage.setItem(COEF_KEY, coefValue);
+                console.log(`Coefficient ${coefValue} stocké depuis l'URL de la page principale.`);
+
+                // 2. Nettoyer l'URL de la page principale (conserve les ancres #)
+                if (window.history.replaceState) {
+                    const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+                    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+                }
+            } else {
+                console.log("Aucun coefficient dans l'URL principale, l'iframe utilisera la valeur existante en stockage.");
+            }
+        }
+
+        // <-- NOUVEAU : Appeler la fonction d'initialisation immédiatement
+        initializeCoefficient();
+
+
+        // --- Le reste de votre script ---
+
         // Récupération des éléments du DOM
         const productCards = document.querySelectorAll('.product-card');
         const configuratorSection = document.getElementById('configuratorSection');
@@ -335,17 +370,23 @@
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const configTitle = document.getElementById('configTitle');
 
-        // Récupérer les paramètres de l'URL de la page
-        const pageQuery = window.location.search;
+        // <-- SUPPRIMÉ : On ne lit plus le query string ici
+        // const pageQuery = window.location.search; 
 
         // Lorsqu'un produit est cliqué, on construit l'URL finale
         productCards.forEach(card => {
             card.addEventListener('click', () => {
                 const baseLink = card.getAttribute('data-link');
+
+                // <-- MODIFIÉ : L'URL finale est JUSTE le lien de base. 
+                // Le coefficient n'est plus passé à l'iframe.
                 let finalUrl = baseLink;
-                if (pageQuery) {
-                    finalUrl += pageQuery;
-                }
+
+                // <-- SUPPRIMÉ : Logique qui ajoutait le ?coef=
+                // if (pageQuery) {
+                //     finalUrl += pageQuery;
+                // }
+
                 configuratorSection.style.display = 'block';
                 configuratorFrame.src = finalUrl;
                 configuratorSection.scrollIntoView({ behavior: 'smooth' });
