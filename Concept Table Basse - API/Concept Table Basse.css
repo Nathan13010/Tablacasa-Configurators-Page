@@ -1,0 +1,945 @@
+@font-face {
+    font-family: 'Inter';
+    src: url('media/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Inter', Arial, sans-serif;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Conteneur du logo */
+.logo-container {
+    position: fixed;
+    top: 20px;
+    /* Ajustez la distance du haut */
+    left: 20px;
+    /* Ajustez la distance de la gauche */
+    z-index: 1000;
+    /* Assurez-vous que le logo reste au-dessus des autres éléments */
+}
+
+/* Style du logo */
+.logo {
+    width: 100px;
+    /* Ajustez la taille selon vos besoins */
+    height: auto;
+}
+
+
+#v3d-container {
+    width: 80%;
+    height: 100vh;
+}
+
+.container {
+    position: fixed;
+    /* Position fixe pour le placer au-dessus */
+    top: 50%;
+    /* Centre verticalement */
+    right: 1%;
+    /* Positionné à 15% de la droite de l'écran */
+    transform: translateY(-50%);
+    /* Ajustement pour centrer verticalement */
+    width: 350px;
+    /* Largeur fixe */
+    height: auto;
+    /* Hauteur automatique */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 24px;
+    border: 2px solid #D4D4D4;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 2;
+}
+
+.fullscreen-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    background-size: 100% 100%;
+    display: none;
+    z-index: 1;
+}
+
+.fullscreen-open {
+    background-image: url('media/full-size.png');
+}
+
+.fullscreen-close {
+    background-image: url('media/minimize.png');
+}
+
+/* removes tap blinking on ios devices */
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+
+.v3d-simple-preloader-logo {
+    background-image: url('media/Tablacasa%20logo.svg');
+}
+
+.v3d-simple-preloader-container {
+    --v3d-preloader-img-width: 200px;
+    --v3d-preloader-img-height: 200px;
+}
+
+
+/* Styles généraux : masquez les deux versions par défaut */
+.desktop-version {
+    display: none;
+}
+
+.mobile-version {
+    display: none;
+}
+
+
+h1 {
+    text-align: center;
+    color: #444;
+    margin-top: 5px;
+}
+
+.section {
+    margin-bottom: 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    /* Ajustez au besoin pour l’espacement */
+    background-color: #ffffff;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    height: auto;
+    /* Hauteur auto pour s'adapter au texte */
+}
+
+.section-header:hover {
+    background-color: #eee;
+}
+
+h2 {
+    color: #555;
+    /* border-bottom: 1px solid #ddd; */
+    padding-bottom: 5px;
+    margin: 0;
+}
+
+.toggle-btn {
+    background: none;
+    color: black;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.section-content {
+    overflow: hidden;
+    max-height: 500px;
+    /* Hauteur maximale pour l'animation */
+    transition: max-height 0.5s ease-in-out;
+    /* Animation plus douce */
+}
+
+.section-content.collapsed {
+    max-height: 0;
+    /* Réduire la hauteur à 0 pour fermer la section */
+    transition: max-height 0.5s ease-in-out;
+    /* Animation plus douce */
+}
+
+/* Styles pour la section Formes */
+.formes-grid {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px;
+    margin-bottom: 0px;
+}
+
+.formes-item {
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.formes-button {
+    width: 100px;
+    height: auto;
+    opacity: 0.35;
+    transition: all 0.3s ease;
+}
+
+.formes-text {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #555;
+    opacity: 0.35;
+    transition: all 0.3s ease;
+}
+
+.formes-item.active .formes-button,
+.formes-item.active .formes-text {
+    opacity: 1;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
+}
+
+.formes-item:not(.active):hover .formes-button,
+.formes-item:not(.active):hover .formes-text {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.formes-item.active:hover .formes-button,
+.formes-item.active:hover .formes-text {
+    transform: scale(1.05);
+}
+
+/* /////////////////////////////////////////////////////// */
+
+/* Styles de base pour les boutons */
+.button-group {
+    display: flex;
+    justify-content: space-around;
+    /* gap: 10px; */
+    margin: 10px;
+}
+
+.dimension-button {
+    padding: 10px 10px;
+    border-radius: 14px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+}
+
+/* Style du bouton actif */
+.dimension-button.active {
+    background-color: #3E3E3E;
+    color: white;
+    opacity: 1;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Hover effect pour les boutons inactifs */
+.dimension-button:not(.active):hover {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Hover effect pour le bouton actif */
+.dimension-button.active:hover {
+    transform: scale(1.05);
+}
+
+/* ////////////////////////////////////////////// */
+
+/* Styles de base pour les images et textes des formes */
+.image-grid {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+    margin-bottom: 1px;
+}
+
+.image-item {
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Animation fluide */
+}
+
+.shape-button {
+    width: 100px;
+    height: auto;
+    opacity: 0.35;
+    /* Opacité de 50% par défaut */
+    transition: all 0.3s ease;
+    /* Animation fluide */
+}
+
+.shape-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    opacity: 0.35;
+    /* Opacité de 50% par défaut */
+    transition: all 0.3s ease;
+    /* Animation fluide */
+}
+
+/* Style du bouton et texte actif */
+.image-item.active .shape-button,
+.image-item.active .shape-text {
+    opacity: 1;
+    /* Opacité à 100% */
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.50));
+    /* Drop shadow qui suit les contours */
+}
+
+/* Hover effect pour les boutons inactifs */
+.image-item:not(.active):hover .shape-button,
+.image-item:not(.active):hover .shape-text {
+    opacity: 1;
+    /* Opacité à 100% au survol */
+    transform: scale(1.05);
+    /* Légère augmentation de la taille */
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+    /* Drop shadow au survol */
+}
+
+/* Hover effect pour le bouton actif */
+.image-item.active:hover .shape-button,
+.image-item.active:hover .shape-text {
+    transform: scale(1.05);
+    /* Légère augmentation de la taille */
+}
+
+/* ///////////////////////////////////////// */
+
+/* Styles de base pour les images et textes des céramiques */
+.ceramique-grid {
+    display: flex;
+    justify-content: space-around;
+    /* flex-wrap: wrap; */
+    gap: 1px;
+    /* Espacement entre les boutons */
+    margin-top: 10px;
+}
+
+.ceramique-item {
+    width: 80px;
+    /* largeur fixe comme sur CT3 */
+    display: flex;
+    flex-direction: column;
+    /* image au-dessus, texte en-dessous */
+    align-items: center;
+    /* centrage horizontal */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ceramique-button {
+    width: 50px;
+    /* même largeur */
+    aspect-ratio: 1/1;
+    /* conserve un carré quelle que soit l’image */
+    object-fit: cover;
+    /* recadre si besoin */
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.ceramique-text {
+    margin-top: 5px;
+    /* petit écart sous l’image */
+    margin-bottom: 0;
+    font-size: 10px;
+    /* taille réduite comme sur CT3 */
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+
+/* Style du bouton et texte actif */
+.ceramique-item.active .ceramique-button {
+    opacity: 1;
+    /* Opacité à 100% */
+    /* filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)); */
+    /* Box shadow */
+    border: 1px solid black;
+    /* Bordure noire */
+    outline: 1px solid black;
+    /* Outline */
+    outline-offset: 3px;
+    /* Offset de l'outline */
+}
+
+.ceramique-item.active .ceramique-text {
+    opacity: 1;
+    /* Opacité à 100% */
+}
+
+/* Hover effect pour les boutons inactifs */
+.ceramique-item:not(.active):hover .ceramique-button,
+.ceramique-item:not(.active):hover .ceramique-text {
+    transform: scale(1.05);
+    /* Légère augmentation de la taille */
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+    /* Drop shadow au survol */
+}
+
+/* Hover effect pour le bouton actif */
+.ceramique-item.active:hover .ceramique-button,
+.ceramique-item.active:hover .ceramique-text {
+    transform: scale(1.05);
+    /* Légère augmentation de la taille */
+}
+
+
+/* //////////////////////////////////////////////// */
+/* Styles pour la section Pietement */
+.pietement-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.pietement-item,
+.pietement-item2 {
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pietement-button,
+.pietement-button2 {
+    width: 100px;
+    height: auto;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.pietement-text,
+.pietement-text2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 14px;
+    color: #555;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.pietement-item.active .pietement-button,
+.pietement-item2.active .pietement-button2,
+.pietement-item.active .pietement-text,
+.pietement-item2.active .pietement-text2 {
+    opacity: 1;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.pietement-item:not(.active):hover .pietement-button,
+.pietement-item:not(.active):hover .pietement-text,
+.pietement-item2:not(.active):hover .pietement-button2,
+.pietement-item2:not(.active):hover .pietement-text2 {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.pietement-item.active:hover .pietement-button,
+.pietement-item.active:hover .pietement-text,
+.pietement-item2.active:hover .pietement-button2,
+.pietement-item2.active:hover .pietement-text2 {
+    transform: scale(1.05);
+}
+
+/* /////////////////////////////////////////////////////////////////// */
+
+/* Styles pour la section Prix */
+.prix-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+    /* Espacement réduit entre les éléments */
+}
+
+.prix-box {
+    background-color: #464646;
+    /* Couleur de fond */
+    padding: 10px 5px;
+    border-radius: 10px;
+    /* Coins arrondis */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prix-text {
+    color: white;
+    /* Couleur du texte */
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.prix-details {
+    flex-grow: 1;
+}
+
+.prix-details p {
+    margin: 0px 0;
+    font-size: 11px;
+    color: #555;
+}
+
+.prix-buttons {
+    display: flex;
+    gap: 10px;
+    /* Espacement entre les boutons */
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    /* Animation fluide */
+}
+
+#table-button {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    height: 30px;
+    color: #555;
+    background: none;
+    border-radius: 4px;
+    border: 1px solid #00000080;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    /* border-color: transparent; */
+    border-radius: 8px;
+    padding: 3px 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#table-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #000000;
+}
+
+.icon-button img {
+    width: 60px;
+    /* Taille des icônes */
+    height: 22px;
+    filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+    /* Couleur #464646 */
+    transition: transform 0.3s ease, filter 0.3s ease;
+    /* Animation fluide */
+}
+
+/* Effet de scale et drop-shadow au survol */
+.icon-button:hover img {
+    transform: scale(1.1);
+    /* Légère augmentation de la taille */
+    filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    /* Légère ombre portée */
+}
+
+
+/* //////////////////////////////////////////////////////////////// */
+
+
+
+
+
+@media (max-width: 1300px) {
+    #v3d-container {
+        width: 70%;
+        /* Prend 80% de la largeur de l'écran */
+        height: 100vh;
+        /* Prend toute la hauteur de l'écran */
+        /* Couleur de fond pour visualisation */
+    }
+}
+
+@media (max-width: 1100px) {
+    #v3d-container {
+        width: 65%;
+        /* Prend 80% de la largeur de l'écran */
+        height: 100vh;
+        /* Prend toute la hauteur de l'écran */
+        /* Couleur de fond pour visualisation */
+    }
+}
+
+
+
+
+
+
+
+@media (min-width: 1051px) {
+
+    .close-container-arrow,
+    .open-container-btn {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1050px) {
+
+    .close-container-arrow,
+    .open-container-btn {
+        display: block;
+    }
+}
+
+
+
+
+/* Afficher uniquement la version desktop pour les grands écrans */
+@media (min-width: 1051px) {
+    .desktop-version {
+        display: block;
+    }
+}
+
+/* Afficher uniquement la version mobile pour les petits écrans */
+@media (max-width: 1050px) {
+    .mobile-version {
+        display: block;
+    }
+}
+
+
+
+
+
+
+
+.close-section {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: black;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+    /* Masqué par défaut */
+}
+
+@media (max-width: 1050px) {
+    .section-content {
+        position: relative;
+        /* Pour que le positionnement absolu du bouton soit relatif au container */
+    }
+
+    .close-section {
+        display: block;
+        /* La valeur sera ensuite gérée par le JS */
+    }
+}
+
+
+
+
+/* /////////////////////////////////////////////////////// */
+
+
+
+/* Styles pour les petits écrans (mobile) */
+@media (max-width: 1050px) {
+
+    body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .logo {
+        width: 70px;
+        /* Ajustez la taille selon vos besoins */
+        height: auto;
+    }
+
+    #v3d-container {
+        flex: 1;
+        width: 100%;
+        height: calc(100vh - var(--container-height));
+        min-height: 0;
+        transform: translateY(-50px);
+        /* Important pour le fonctionnement de flex */
+    }
+
+    .container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100% !important;
+        max-height: 60vh;
+        margin: 0;
+        padding: 10px 0;
+        /* Padding vertical uniquement */
+        background: white;
+        border-top: 2px solid #D4D4D4;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+        z-index: 1000;
+        overflow-y: auto;
+        transform: none;
+        /* Supprimez les déclarations conflicting */
+        right: auto;
+        top: auto;
+    }
+
+    /* Pour conserver le padding interne sans affecter la largeur */
+    .container>.section,
+    .container>.mobile-version {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    /* Ajouter une marge virtuelle pour le contenu 3D */
+    #v3d-container::after {
+        content: '';
+        display: block;
+        height: 60px;
+        /* Correspond à la hauteur approximative du container */
+    }
+
+    h1 {
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        margin-left: 10px;
+        font-size: 18px;
+    }
+
+    /* Conteneur pour les en-têtes des sections */
+    .sections-container {
+        display: flex;
+        justify-content: space-around;
+        /* gap: 10px; */
+        padding-bottom: 10px;
+        overflow-x: auto;
+        /* Permettre le défilement horizontal si nécessaire */
+    }
+
+    .section-header {
+        flex: 0 0 auto;
+        padding: 10px;
+        background-color: #eeeeee;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-align: center;
+    }
+
+    .mobile-version .section-header.active {
+        background-color: #c5c5c5 !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-header:hover {
+        background-color: #eee;
+    }
+
+    .section-header h2 {
+        font-size: 14px;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    /* Conteneur pour les options des sections */
+    .options-container {
+        width: 100%;
+    }
+
+    .section-content {
+        display: none;
+        margin-top: 10px;
+        width: 100%;
+        /* Prendre toute la largeur du conteneur */
+    }
+
+    .section-content.active {
+        display: block;
+
+    }
+
+    /* Styles pour les options */
+    .formes-grid,
+    .pietement-grid {
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+        padding-top: 1px;
+        overflow-x: auto;
+    }
+
+    .formes-button,
+    .pietement-button {
+        width: 110px;
+        height: auto;
+    }
+
+    .ceramique-button {
+        width: 65px;
+        height: auto;
+    }
+
+    .formes-text,
+    .ceramique-text,
+    .pietement-text {
+        font-size: 12px;
+    }
+
+    /* Section Prix */
+    .prix-container {
+        margin: 10px;
+    }
+
+    .prix-box {
+        padding: 10px;
+    }
+
+    .prix-text {
+        font-size: 15px;
+    }
+
+    .prix-details p {
+        font-size: 11px;
+    }
+
+    .prix-buttons {
+        gap: 5px;
+    }
+
+    .icon-button img {
+        width: 60px;
+        height: auto;
+    }
+
+    /* Bouton flèche (petite flèche en V) */
+    .close-container-arrow {
+        display: block;
+        position: fixed;
+        /* fixe par rapport à la fenêtre */
+        top: 10px;
+        /* par exemple 10px du haut */
+        right: 10px;
+        /* 10px du côté droit */
+        width: 30px;
+        height: 30px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 1001;
+        /* au-dessus du container */
+    }
+
+    /* Création d’un V en utilisant un pseudo-élément */
+    .close-container-arrow::before {
+        content: '';
+        display: block;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid black;
+        border-bottom: 2px solid black;
+        transform: rotate(45deg);
+        margin: 0 auto;
+    }
+
+
+    /* Bouton "Configurer" (initialement masqué) */
+    .open-container-btn {
+        font-family: 'Inter', Arial, sans-serif;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        font-family: Inter;
+        border-radius: 30px;
+        background-color: white;
+        color: black;
+        border: 1px solid #000000;
+        transform: translateX(-50%);
+        padding: 10px 10px;
+        font-size: 16px;
+        display: none;
+        z-index: 1001;
+    }
+
+
+
+    /* Transition pour faire glisser le container vers le bas */
+    .container {
+        transition: transform 0.5s ease;
+    }
+
+    /* Lorsqu'on ferme le container, on lui applique la classe 'closed' */
+    .container.closed {
+        transform: translateY(100%);
+        /* glisse le container hors de l'écran par le bas */
+    }
+
+    /* (Optionnel) Si vous souhaitez masquer la flèche quand une section est active,
+     vous pouvez gérer sa visibilité via JS (voir ci-dessous) ou via une règle CSS dynamique */
+}
+
+/* /////////////////////////////////////////////////// */
+
+
+/* Ajoutez ceci dans votre CSS */
+@media (max-height: 1000px) and (max-width: 500px) {
+    #v3d-container {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    #v3d-container.shifted {
+        transform: translateY(-120px);
+    }
+}
+
+.add-to-cart-button {
+    background-color: #000000;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+    background-color: #333333;
+}

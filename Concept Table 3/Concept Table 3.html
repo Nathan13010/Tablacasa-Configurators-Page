@@ -1,0 +1,334 @@
+<!-- __V3D_PUZZLES__ - enable Puzzles button in the App Manager -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Allonges Rotatives</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <meta name="description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Concept Table 3">
+  <meta name="twitter:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta name="twitter:image:src" content="media/home_banner_1.jpg">
+  <meta property="og:title" content="Concept Table 3">
+  <meta property="og:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta property="og:image" content="media/home_banner_1.jpg">
+  <meta property="og:type" content="website">
+
+  <meta name="generator" content="Verge3D 4.7.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/media/180x180.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/media/48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/media/32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/media/16x16.png">
+  <link rel="manifest" href="media/manifest.json">
+  <link rel="mask-icon" href="media/safari-pinned-tab.svg" color="#0048a5">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="/v3d-core/v3d.js"></script>
+  <script src="Concept Table 3.js"></script>
+
+  <script>
+    window.configuratorData = {
+      logicType: 'table',
+
+      // Map 1: Forme.Dimension -> ID Produit Parent (EXISTANT)
+      productParentMap: {
+        "RO.135": 651, "RO.150": 652, "RO.190": 653,
+        "PE.135": 654, "PE.150": 655, "PE.190": 656,
+        "CA.135": 657, "CA.150": 658, "CA.190": 659
+      },
+
+      // Map 2: ID Bouton Céramique -> Code Céramique (EXISTANT)
+      variantMap: {
+        "CMB": "CMB", "CGA": "CGA", "CMN": "CMN",
+        "CB": "CB", "CBB": "CBB", "CT": "CT"
+      },
+
+      // Map 3: Dimension -> Piètement -> ID Composant (EXISTANT)
+      componentMap: {
+        "135": { "PX": "41", "PH": "46", "PR": "44" },
+        "150": { "PX": "41", "PH": "46", "PR": "44" },
+        "190": { "PX": "42", "PH": "45", "PR": "43" }
+      },
+
+      // --- AJOUTER CES DEUX MAPS CI-DESSOUS ---
+
+      // Map 4: Map de traduction pour les FORMES
+      formRefMap: {
+        "fleche": "PE", // Traduit id="fleche" en "PE"
+        "rond": "RO",   // Traduit id="rond" en "RO"
+        "carré": "CA"   // Traduit id="carré" en "CA"
+      },
+
+      // Map 5: Map de traduction pour les DIMENSIONS
+      dimRefMap: {
+        "a": "135", // Traduit id="a" en "135"
+        "b": "150", // Traduit id="b" en "150"
+        "c": "190"  // Traduit id="c" en "190"
+      }
+    };
+  </script>
+
+  <script defer src="/apiHandler.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"
+    integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="stylesheet" type="text/css" href="Concept Table 3.css">
+</head>
+
+<body id="body">
+  <header>
+    <div class="logo-container">
+      <img src="media/Tablacasa-logo-header.svg" alt="Tablacasa Logo" class="logo">
+    </div>
+  </header>
+
+  <div id="v3d-container"></div>
+
+  <button type="button" class="close-container-arrow"></button>
+
+  <button type="button" class="open-container-btn">Configurer</button>
+
+  <div class="container">
+
+    <h1 id="title-product-name">Allonges Rotatives</h1>
+
+    <div class="desktop-version">
+      <div class="section">
+        <div class="section-header">
+          <h2>Formes</h2>
+          <button type="button" class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="formes-grid">
+            <div id="fleche" class="formes-item active">
+              <img src="media/Fleche.png" alt="Fleche" class="formes-button">
+              <p class="formes-text">PENTAGONE</p>
+            </div>
+            <div id="rond" class="formes-item">
+              <img src="media/Rond.png" alt="Rond" class="formes-button">
+              <p class="formes-text">ROND</p>
+            </div>
+            <div id="carré" class="formes-item">
+              <img src="media/Rectangle.png" alt="carré" class="formes-button">
+              <p class="formes-text">CARRÉ</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" id="dim">
+          <h2>Dimensions</h2>
+          <button type="button" class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed" id="dim2">
+          <div class="button-group">
+            <button type="button" id="a" class="dimension-button">135 cm</button>
+            <button type="button" id="b" class="dimension-button">150 cm</button>
+            <button type="button" id="c" class="dimension-button active">190 cm</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Céramiques</h2>
+          <button type="button" class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="ceramique-grid">
+            <div id="CMB" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN" class="ceramique-item">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB" class="ceramique-item active">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+            <div id="CT" class="ceramique-item">
+              <img src="./Travertin.jpg" alt="Marbre Travertin" class="ceramique-button">
+              <p class="ceramique-text">Marbre Travertin</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Piètements</h2>
+          <button type="button" class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="pietement-grid">
+            <div id="PX" class="pietement-item active">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PH" class="pietement-item">
+              <img src="media/PH.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PH</p>
+            </div>
+            <div id="PR" class="pietement-item">
+              <img src="media/PR.webp" alt="PR" class="pietement-button">
+              <p class="pietement-text">PR</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-version">
+      <div class="sections-container">
+        <button type="button" class="close-section">&times;</button>
+        <div class="section-header" data-section="formes">
+          <h2>Formes</h2>
+        </div>
+        <div class="section-header" data-section="dimensions" id="dim3">
+          <h2>Dimensions</h2>
+        </div>
+        <div class="section-header" data-section="ceramique">
+          <h2>Céramiques</h2>
+        </div>
+        <div class="section-header" data-section="pietement">
+          <h2>Piètements</h2>
+        </div>
+      </div>
+
+      <div class="options-container">
+        <div class="section-content" id="formes-content">
+          <div class="formes-grid">
+            <div id="fleche2" class="formes-item active">
+              <img src="media/Fleche.png" alt="fleche" class="formes-button">
+              <p class="formes-text">PENTAGONE</p>
+            </div>
+            <div id="rond2" class="formes-item">
+              <img src="media/Rond.png" alt="Rond2" class="formes-button">
+              <p class="formes-text">ROND</p>
+            </div>
+            <div id="carré2" class="formes-item">
+              <img src="media/Rectangle.png" alt="carré" class="formes-button">
+              <p class="formes-text">CARRÉ</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-content" id="dimensions-content">
+          <div class="button-group">
+            <button type="button" id="a2" class="dimension-button">135 cm</button>
+            <button type="button" id="b2" class="dimension-button">150 cm</button>
+            <button type="button" id="c2" class="dimension-button active">190 cm</button>
+          </div>
+        </div>
+
+        <div class="section-content" id="ceramique-content">
+          <div class="ceramique-grid">
+            <div id="CMB2" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA2" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN2" class="ceramique-item">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB2" class="ceramique-item active">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB2" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+            <div id="CT2" class="ceramique-item">
+              <img src="./Travertin.jpg" alt="Marbre Travertin" class="ceramique-button">
+              <p class="ceramique-text">Marbre Travertin</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-content" id="pietement-content">
+          <div class="pietement-grid">
+            <div id="PX2" class="pietement-item active">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PH2" class="pietement-item">
+              <img src="media/PH.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PH</p>
+            </div>
+            <div id="PR2" class="pietement-item">
+              <img src="media/PR.webp" alt="PR" class="pietement-button">
+              <p class="pietement-text">PR</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 style="border-bottom: 2px solid #ddd"></h2>
+      <div class="prix-container" id="prix-container">
+        <div class="prix-box">
+          <span class="prix-text" id="product-price">- €</span>
+        </div>
+        <div class="prix-details">
+          <p>eco-part : <span id="eco-part">-</span> €</p>
+          <P id="id">Ref : <span id="1">PE</span>.<span id="2">190</span>-<span id="3">CB</span>-<span id="4">PX</span>
+          </p>
+          <p>Conditionnement : <span id="conditionnement">..</span></p>
+          <p>Stock : <span id="stock-status">-</span></p>
+        </div>
+        <div class="prix-buttons">
+          <button type="button" class="icon-button" id="ruller-button">
+            <img src="media/ruller.svg" alt="Ruller">
+          </button>
+          <button type="button" id="table-button">Ouvrir</button>
+        </div>
+      </div>
+      <button id="add-to-cart" class="add-to-cart-button">Ajouter au panier</button>
+    </div>
+  </div>
+
+</body>
+
+<script>
+  function hasQueryParam(param) {
+    return new URLSearchParams(window.location.search).has(param);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (hasQueryParam("hideprice")) {
+      const prixBox = document.querySelector(".prix-box");
+      const prixDetails = document.querySelector(".prix-details");
+
+      if (prixBox) prixBox.style.display = "none";
+      if (prixDetails) prixDetails.style.display = "none";
+    }
+  });
+</script>
+
+</html>

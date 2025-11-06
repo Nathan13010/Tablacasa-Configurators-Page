@@ -1,0 +1,7 @@
+# Fichiers textes (code) : s'assurer que Git gère correctement les sauts de ligne
+*.js      text auto
+
+# Fichiers binaires : IMPORTANT pour les GLTF, désactiver toute conversion
+*.gltf    binary
+*.glb     binary
+*.svg     text eol=lf

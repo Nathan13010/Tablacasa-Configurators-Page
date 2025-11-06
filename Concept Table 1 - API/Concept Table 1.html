@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!-- __V3D_PUZZLES__ - enable Puzzles button in the App Manager -->
+<!-- __V3D_TEMPLATE__ - template-based file; delete this line to prevent this file from being updated -->
+<html lang="en">
+
+<head>
+  <title>Allonges Italiennes</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <!-- Search Engines -->
+  <meta name="description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Concept Table 1">
+  <meta name="twitter:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta name="twitter:image:src" content="media/home_banner_1.jpg">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Concept Table 1">
+  <meta property="og:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta property="og:image" content="media/home_banner_1.jpg">
+  <meta property="og:type" content="website">
+
+  <meta name="generator" content="Verge3D 4.7.1">
+
+  <!-- favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/media/180x180.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/media/48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/media/32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/media/16x16.png">
+  <link rel="manifest" href="media/manifest.json">
+  <link rel="mask-icon" href="media/safari-pinned-tab.svg" color="#0048a5">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="/v3d-core/v3d.js"></script>
+  <script src="Concept Table 1.js"></script>
+
+  <script>
+    window.configuratorData = {
+      // 1. Type de logique (identique à Concept Table 3)
+      logicType: 'table',
+
+      // 2. Map Produit Parent : (Forme + Dimension API) -> ID Produit Parent API
+      // Données issues de "concept table 1 API responses.json"
+      productParentMap: {
+        "OV.160": 590, // PENTAGONE 135 CM
+        "OV.180": 591, // PENTAGONE 150 CM
+        "OV.200": 592, // PENTAGONE 190 CM
+        "TO.160": 584, // ROND 135 CM
+        "TO.180": 585, // ROND 150 CM
+        "TO.200": 586, // ROND 190 CM
+        "RE.160": 587, // CARRE 135 CM
+        "RE.180": 588, // CARRE 150 CM
+        "RE.200": 589  // CARRE 190 CM
+      },
+
+      // 3. Map Variantes : (ID Bouton Céramique -> Code Céramique API)
+      // Les IDs HTML correspondent aux codes API, donc c'est une map directe.
+      variantMap: {
+        "CMB": "CMB",
+        "CGA": "CGA",
+        "CMN": "CMN",
+        "CB": "CB",
+        "CBB": "CBB",
+        "CT": "CT"
+      },
+
+      // 4. Map Composants : (Dimension -> Piètement -> ID Composant API)
+      // Données issues de "concept table 1 API responses.json"
+      componentMap: {
+        "160": {
+          "PX": "13",
+          "PH": "15",
+          "PV": "17"
+        },
+        "180": {
+          "PX": "13",
+          "PH": "15",
+          "PV": "17"
+        },
+        "200": {
+          "PX": "14",
+          "PH": "15",
+          "PV": "16"
+        }
+      },
+
+      // 5. Map Traduction Forme : (ID Bouton HTML -> Code Forme API)
+      // Identique à Concept Table 3 car les IDs HTML sont les mêmes
+      formRefMap: {
+        "ovale": "OV",
+        "tonneau": "TO",
+        "rectangle": "RE"
+      },
+
+      // 6. Map Traduction Dimension : (ID Bouton HTML -> Code Dimension API)
+      // Identique à Concept Table 3 car les IDs HTML sont les mêmes
+      dimRefMap: {
+        "w": "160",
+        "x": "180",
+        "y": "200"
+      }
+
+      // 7. pietementRefMap n'est pas nécessaire ici car les IDs HTML (PX, PH, PR)
+      // sont déjà les codes API attendus par le componentMap.
+    };
+  </script>
+
+  <script defer src="/apiHandler.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"
+    integrity="sha512-aNMyYYxdIxIaot0Y1/PLuEu3eipGCmsEUBrUq+7aVyPGMFH8z0eTP0tkqAvv34fzN6z+201d3T8HPb1svWSKHQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="stylesheet" type="text/css" href="Concept Table 1.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="media/Tablacasa-logo-header.svg" alt="Tablacasa Logo" class="logo">
+    </div>
+  </header>
+
+  <div id="v3d-container"></div>
+
+  <button class="close-container-arrow"></button>
+
+  <button class="open-container-btn">Configurer</button>
+
+  <div class="container configurator" data-config-id="cfg-table1">
+
+    <h1 id="title-product-name">Allonges Italiennes</h1>
+    <!-- Version pour grand écran -->
+    <div class="desktop-version">
+      <!-- Section Formes -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Formes</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="formes-grid">
+            <div id="ovale" class="formes-item">
+              <img src="media/ovale.png" alt="Ovale" class="formes-button">
+              <p class="formes-text">OVALE</p>
+            </div>
+            <div id="tonneau" class="formes-item">
+              <img src="media/tonneau.png" alt="Tonneau" class="formes-button">
+              <p class="formes-text">TONNEAU</p>
+            </div>
+            <div id="rectangle" class="formes-item active">
+              <img src="media/rectangle.png" alt="Rectangle" class="formes-button">
+              <p class="formes-text">RECTANGLE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Dimensions (fermée par défaut) -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Dimensions</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="button-group">
+            <button id="w" class="dimension-button active">L160/240</button>
+            <button id="x" class="dimension-button">L180/260</button>
+            <button id="y" class="dimension-button">L200/280</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Ceramique (fermée par défaut) -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Céramiques</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="ceramique-grid">
+            <div id="CMB" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN" class="ceramique-item active">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB" class="ceramique-item">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Pietement -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Piètements</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="pietement-grid">
+            <div id="PX" class="pietement-item">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PH" class="pietement-item">
+              <img src="media/PH.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PH</p>
+            </div>
+            <div id="PV" class="pietement-item active">
+              <img src="media/PV.png" alt="PV" class="pietement-button">
+              <p class="pietement-text">PV</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Version pour petit écran -->
+    <div class="mobile-version">
+      <!-- Conteneur pour les en-têtes des sections -->
+      <div class="sections-container">
+        <button class="close-section">&times;</button>
+        <div class="section-header" data-section="formes">
+          <h2>Formes</h2>
+        </div>
+        <div class="section-header" data-section="dimensions">
+          <h2>Dimensions</h2>
+        </div>
+        <div class="section-header" data-section="ceramique">
+          <h2>Céramiques</h2>
+        </div>
+        <div class="section-header" data-section="pietement">
+          <h2>Piètements</h2>
+        </div>
+      </div>
+
+      <!-- Conteneur pour les options des sections -->
+      <div class="options-container">
+        <!-- Options pour Formes -->
+        <div class="section-content" id="formes-content">
+          <div class="formes-grid">
+            <div id="ovale2" class="formes-item">
+              <img src="media/ovale.png" alt="Ovale" class="formes-button">
+              <p class="formes-text">OVALE</p>
+            </div>
+            <div id="tonneau2" class="formes-item">
+              <img src="media/tonneau.png" alt="Tonneau" class="formes-button">
+              <p class="formes-text">TONNEAU</p>
+            </div>
+            <div id="rectangle2" class="formes-item active">
+              <img src="media/rectangle.png" alt="Rectangle" class="formes-button">
+              <p class="formes-text">RECTANGLE</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Options pour Dimensions -->
+        <div class="section-content" id="dimensions-content">
+          <div class="button-group">
+            <button id="160" class="dimension-button active">L160/240</button>
+            <button id="180" class="dimension-button">L180/260</button>
+            <button id="200" class="dimension-button">L200/280</button>
+          </div>
+        </div>
+
+        <!-- Options pour Ceramique -->
+        <div class="section-content" id="ceramique-content">
+          <div class="ceramique-grid">
+            <div id="CMB2" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA2" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN2" class="ceramique-item active">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB2" class="ceramique-item">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB2" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Options pour Pietement -->
+        <div class="section-content" id="pietement-content">
+          <div class="pietement-grid">
+            <div id="PX2" class="pietement-item">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PH2" class="pietement-item">
+              <img src="media/PH.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PH</p>
+            </div>
+            <div id="PV2" class="pietement-item active">
+              <img src="media/PV.png" alt="PV" class="pietement-button">
+              <p class="pietement-text">PV</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Prix (toujours visible) -->
+    <div class="section" id="prix-section">
+      <h2 style="border-bottom: 2px solid #ddd"></h2>
+      <div class="prix-container">
+        <div class="prix-box">
+          <span class="prix-text" id="price">-</span>
+          <hidden id="product-price" style="display: none;"></hidden>
+        </div>
+        <div class="prix-details">
+          <p>eco-part : <span id="eco-part">-</span> €</p>
+          <p id="id">Ref : <span id="1">RE</span>.<span id="2">160</span>-<span id="3">CMN</span>-<span id="4">PV</span>
+          </p>
+          <p>Conditionnement : <span id="conditionnement">..</span></p>
+          <p>Stock : <span id="stock-status">-</span></p>
+        </div>
+        <div class="prix-buttons">
+          <button class="icon-button" id="ruller-button">
+            <img src="media/ruller.svg" alt="Ruller">
+          </button>
+          <button id="table-button">Ouvrir</button>
+        </div>
+      </div>
+      <button id="add-to-cart" class="add-to-cart-button">Ajouter au panier</button>
+    </div>
+  </div>
+  </div>
+
+</body>
+<script defer src="add-to-cart.js"></script>
+
+<script>
+  function hasQueryParam(param) {
+    return new URLSearchParams(window.location.search).has(param);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (hasQueryParam("hideprice")) {
+      const prixBox = document.querySelector(".prix-box");
+      const prixDetails = document.querySelector(".prix-details");
+
+      if (prixBox) prixBox.style.display = "none";
+      if (prixDetails) prixDetails.style.display = "none";
+    }
+  });
+</script>
+
+</html>
