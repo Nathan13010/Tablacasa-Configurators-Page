@@ -11,6 +11,7 @@
             margin: 0;
             padding: 20px;
             background: #f5f5f5;
+
         }
 
         .container {
@@ -305,8 +306,9 @@
         // Clé pour le localStorage DE CETTE PAGE (le parent)
         const MAIN_COEF_KEY = 'ar_main_page_coefficient';
         let activeCoefficient = 1; // Coefficient par défaut en mémoire
+        let hidePriceActive = false; // NOUVEAU: Flag pour masquer le prix
 
-        // 1. Lire le coef de l'URL principale, le stocker, et nettoyer l'URL
+        // 1. Lire les paramètres de l'URL principale (coef et hideprice), les stocker, et nettoyer l'URL
         function initializeCoefficient() {
             const urlParams = new URLSearchParams(window.location.search);
             const urlCoef = urlParams.get("coef");
@@ -321,12 +323,6 @@
                 localStorage.setItem(MAIN_COEF_KEY, activeCoefficient); // Stocke pour les rechargements
 
                 console.log(`Coefficient ${activeCoefficient} lu depuis l'URL principale.`);
-
-                // Nettoyer l'URL de la page principale (conserve les ancres #)
-                if (window.history.replaceState) {
-                    const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
-                    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-                }
             } else {
                 // Cas 2: Pas de coef dans l'URL (ex: rechargement de la page)
                 const storedCoef = localStorage.getItem(MAIN_COEF_KEY);
@@ -334,6 +330,18 @@
                     activeCoefficient = parseFloat(storedCoef);
                     console.log(`Coefficient ${activeCoefficient} lu depuis le stockage principal.`);
                 }
+            }
+
+            // NOUVEAU: Détecter le paramètre hideprice
+            if (urlParams.has("hideprice")) {
+                hidePriceActive = true;
+                console.log("Le paramètre 'hideprice' est actif.");
+            }
+
+            // Nettoyer l'URL de la page principale (conserve les ancres #)
+            if (window.history.replaceState) {
+                const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+                window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
             }
         }
 
@@ -350,17 +358,25 @@
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const configTitle = document.getElementById('configTitle');
 
-        // <--- MODIFIÉ : Clic sur le produit
+        // <--- LOGIQUE MISE À JOUR : Clic sur le produit
         productCards.forEach(card => {
             card.addEventListener('click', () => {
                 const baseLink = card.getAttribute('data-link');
                 let finalUrl = baseLink;
 
-                // <--- LOGIQUE AJOUTÉE : Ajoute le coef à l'URL de l'iframe
+                // Initialisation du séparateur pour le premier paramètre
+                let separator = baseLink.includes('?') ? '&' : '?';
+
+                // 1. AJOUTE LE COEFFICIENT
                 if (activeCoefficient !== 1) {
-                    // Vérifie si le lien de base a déjà des paramètres
-                    const separator = baseLink.includes('?') ? '&' : '?';
-                    finalUrl = `${baseLink}${separator}coef=${activeCoefficient}`;
+                    finalUrl = `${finalUrl}${separator}coef=${activeCoefficient}`;
+                    separator = '&'; // Les paramètres suivants utilisent &
+                }
+
+                // 2. AJOUTE HIDEPRICE
+                if (hidePriceActive) {
+                    finalUrl = `${finalUrl}${separator}hideprice`;
+                    separator = '&'; // Les paramètres suivants utilisent &
                 }
 
                 console.log("Chargement de l'iframe avec l'URL:", finalUrl);
