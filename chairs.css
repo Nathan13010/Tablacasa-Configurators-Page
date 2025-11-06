@@ -1,0 +1,304 @@
+/* __V3D_TEMPLATE__ - template-based file; delete this line to prevent this file from being updated */
+
+
+.fullscreen-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    background-size: 100% 100%;
+    display: none;
+    z-index: 1;
+}
+
+.fullscreen-open {
+    background-image: url('media/fullscreen_open.svg');
+}
+
+.fullscreen-close {
+    background-image: url('media/fullscreen_close.svg');
+}
+
+/* Enlève le clignotement au toucher sur iOS */
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Préchargeur V3D */
+
+.v3d-simple-preloader-logo {
+    /* Le chemin doit être ajusté pour être relatif à la racine ou au chemin d'inclusion */
+    background-image: url('/media/Tablacasa%20logo.svg');
+}
+
+.v3d-simple-preloader-container {
+    --v3d-preloader-img-width: 200px;
+    --v3d-preloader-img-height: 200px;
+}
+
+/* -------------------------------------------------------- */
+/* Gestion des Polices */
+
+@font-face {
+    font-family: 'Poppins-Medium';
+    src: url(/fonts/Poppins-Medium.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins-SemiBold';
+    src: url(/fonts/Poppins-SemiBold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins-Bold';
+    src: url(/fonts/Poppins-Bold.ttf) format('truetype');
+}
+
+/* -------------------------------------------------------- */
+/* Structure Principale et Panneau de Contrôle */
+
+body {
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    background-color: color(display-p3 1 1 1);
+}
+
+#v3d-container {
+    flex: 2;
+    height: 100%;
+    background-color: #ffffff;
+    background-color: color(display-p3 1 1 1);
+    transform: translateZ(0);
+}
+
+.control-panel {
+    flex: 0 0 auto;
+    height: auto;
+    margin: 15px;
+    padding: 1rem;
+    padding-bottom: 5px;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+    outline: 1px solid #d4d4d4;
+    transform: translateZ(0);
+}
+
+h1 {
+    font-family: 'Poppins-Bold', sans-serif;
+    font-size: 28px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+h2 {
+    font-family: 'Poppins-SemiBold', sans-serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+#selected-color,
+#selected-color2 {
+    /* Ajouté pour supporter les deux projets */
+    font-family: 'Poppins-Medium', sans-serif;
+    font-size: 15px;
+    color: #0000007e;
+    font-weight: 100;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#toggle-menu {
+    display: none;
+}
+
+#menu-sections {
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* -------------------------------------------------------- */
+/* Options de Configuration (Couleur, Assise, Piètement) */
+
+.color-options,
+.color-options2,
+/* Ajouté pour supporter le projet Fugace */
+.seating-options,
+.footing-options {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.color-options button,
+.color-options2 button,
+/* Ajouté pour supporter le projet Fugace */
+.seating-options button,
+.footing-options button {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.color-options button,
+.color-options2 button {
+    /* Ajouté pour supporter le projet Fugace */
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.hover1:hover,
+.hover4:hover {
+    /* Ajouté pour supporter le projet Fugace */
+    transform: scale(1.25);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.active1,
+.active4 {
+    /* Ajouté pour supporter le projet Fugace */
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.seating-options button,
+.footing-options button {
+    padding: 0.5rem 1rem;
+    font-family: 'Poppins-Medium', sans-serif;
+    font-size: 15px;
+    border-radius: 9999px;
+    border: 1px solid;
+    cursor: pointer;
+    background-color: #ffffff;
+}
+
+.seating-options button:hover,
+.footing-options button:hover {
+    transform: scale(1.05);
+}
+
+.seating-options button.active2,
+.footing-options button.active3 {
+    color: black;
+    border-color: black;
+    background-color: #ffffff;
+}
+
+/* -------------------------------------------------------- */
+/* Section Prix et Panier */
+
+.section {
+    margin-bottom: 10px;
+    font-family: 'Poppins-Medium', sans-serif;
+}
+
+.prix-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 5px;
+    gap: 10px;
+}
+
+.prix-text {
+    color: rgb(0, 0, 0);
+    font-family: 'Poppins-SemiBold', sans-serif;
+    font-size: 22px;
+}
+
+.prix-details {
+    flex-grow: 1;
+}
+
+.prix-details p {
+    margin: 0px 0;
+    font-size: 11px;
+    color: #555;
+}
+
+.add-to-cart-button {
+    background-color: #000000;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+    background-color: #333333;
+}
+
+/* -------------------------------------------------------- */
+/* Media Queries (Mobile) */
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    #v3d-container {
+        flex: 0 0 auto;
+        width: 100%;
+        height: 100%;
+        transform: translateY(-12%);
+    }
+
+    .control-panel {
+        margin-top: 1rem;
+        margin-bottom: 1px;
+        position: absolute;
+        bottom: 20px;
+        padding: 0.3rem 1rem !important;
+    }
+
+    .v3d-simple-preloader-background {
+        height: 100vh;
+    }
+
+    h1,
+    h2 {
+        margin: 5px !important;
+    }
+
+    .color-options,
+    .color-options2,
+    .seating-options,
+    .footing-options {
+        margin-bottom: 0.5rem !important;
+    }
+
+    #toggle-menu {
+        display: block;
+        margin-left: auto;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        border: 1px solid #d4d4d4;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        display: none;
+        font-family: 'Poppins-SemiBold', sans-serif;
+        color: rgb(0, 0, 0);
+    }
+}

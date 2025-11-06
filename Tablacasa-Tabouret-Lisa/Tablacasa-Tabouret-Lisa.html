@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<!-- __V3D_PUZZLES__ - enable Puzzles button in the App Manager -->
+<!-- __V3D_TEMPLATE__ - template-based file; delete this line to prevent this file from being updated -->
+<html lang="fr">
+
+<head>
+  <title>Lisa</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Lisa">
+  <meta property="og:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta property="og:image" content="media/Lisa_Chair.jpg">
+  <meta property="og:type" content="website">
+
+  <meta name="generator" content="Verge3D 4.8.0">
+
+  <!-- favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/media/180x180.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/media/48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/media/32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/media/16x16.png">
+  <link rel="manifest" href="media/manifest.json">
+  <link rel="mask-icon" href="media/safari-pinned-tab.svg" color="#0048a5">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="/v3d-core/v3d.js"></script>
+  <script src="Tablacasa-Tabouret-Lisa.js"></script>
+
+  <script>
+    window.configuratorData = {
+      parentProductId: 646,
+      logicType: 'stool', // <-- 1. Indique au script d'utiliser la logique "tabouret"
+      variantMap: {
+        "TB-LIS-MC": 1570,
+        "TB-LIS-MF": 1571,
+        "TB-LIS-GR": 1572,
+      },
+      // 2. Mappage des nouveaux codes aux SKUs de l'API
+      componentMap: {
+        "PNP": "5",
+        "PBP": "6",
+        "PI": "7",
+        "PNF": "40"
+      },
+      colorRefMap: {
+        "Marron": "MR",
+        "Jaune": "JN",
+        "Taupe": "TP",
+        "Orange": "OR",
+        "Beige": "BC",
+        "Gris": "GR",
+        "Bleu": "BL",
+        "Noir": "NR",
+        "Vert": "VR",
+        "Marron Clair": "MC",
+        "Marron Foncé": "MF",
+        "Gris": "GR",
+      }
+    };
+  </script>
+
+  <script defer src="/apiHandler.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/chairs.css">
+
+</head>
+
+<body id="body">
+  <div id="v3d-container" style="filter: contrast(110%);"></div>
+
+  <div class=" control-panel">
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <h1 id="title-product-name">Lisa</h1>
+      <button id="toggle-menu">Configurer</button>
+    </div>
+
+    <div id="menu-sections" style="overflow: hidden; transition: max-height 0.5s ease;">
+      <div>
+        <h2>Couleur : <span id="selected-color">Marron Clair</span></h2>
+        <div class="color-options">
+          <button id="Marron Clair" class="hover1 active1" style="background-color: #b37f5c;"></button>
+          <button id="Marron Foncé" class="hover1" style="background-color: #6d5b55;"></button>
+          <button id="Gris" class="hover1" style="background-color: #595d64;"></button>
+        </div>
+      </div>
+
+      <div>
+        <h2>Assise</h2>
+        <div class="seating-options">
+          <button id="Pivotante" class="hover2">Pivotante</button>
+          <button id="Fixe" class="hover2 active2">Fixe</button>
+        </div>
+      </div>
+
+      <div>
+        <h2>Piètement</h2>
+        <div class="footing-options">
+          <button id="4 pieds" class="hover3 active3">4 pieds</button>
+          <button id="Piston" class="hover3">Piston</button>
+        </div>
+      </div>
+
+      <div>
+        <h2>Couleur Piètement : <span id="selected-color2">Métal Noir</span></h2>
+        <div class="color-options2">
+          <button id="Métal Noir" class="hover4 active4" style="background-color: #000000;"></button>
+          <button id="Métal Bois" class="hover4" style="background-color: #dbc4a9;"></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 style="border-bottom: 1px solid #000000"></h2>
+        <div class="prix-container" id="prix-container">
+          <span class="prix-text" id="price">-</span>
+
+          <div class="prix-details">
+            <p>eco-part : <span id="eco-part">-</span> €</p>
+            <P id="id">Ref : <span id="ref">TB-LIS</span>.<span id="ref C">MC</span>-<span id="ref P">PNF</span>
+            </p>
+            <p>Conditionnement : <span id="conditionnement">..</span></p>
+            <p>Stock : <span id="stock-info">-</span></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <script>
+    // Gérer les boutons de couleur (Couleurs)
+    const colorButtons = document.querySelectorAll('.hover1');
+
+    const initializeActiveColorButton = () => {
+      const activeButton = document.querySelector('.active1');
+      if (activeButton) {
+        const buttonColor = getComputedStyle(activeButton).backgroundColor;
+        activeButton.style.outlineColor = buttonColor;
+      }
+    };
+
+    // Initialisation des boutons de couleur au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeActiveColorButton();
+    });
+
+    colorButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelector('.active1')?.classList.remove('active1');
+        button.classList.add('active1');
+        const buttonColor = getComputedStyle(button).backgroundColor;
+        button.style.outlineColor = buttonColor;
+      });
+    });
+
+    //////////////////////////////////////////////////////////////////////////
+
+    // Gérer les boutons de couleur 2 (Couleurs)
+    const colorButtons2 = document.querySelectorAll('.hover4');
+
+    const initializeActiveColorButton2 = () => {
+      const activeButton2 = document.querySelector('.active4');
+      if (activeButton2) {
+        const buttonColor2 = getComputedStyle(activeButton2).backgroundColor;
+        activeButton2.style.outlineColor = buttonColor2;
+      }
+    };
+
+    // Initialisation des boutons de couleur au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeActiveColorButton2();
+    });
+
+    colorButtons2.forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelector('.active4')?.classList.remove('active4');
+        button.classList.add('active4');
+        const buttonColor2 = getComputedStyle(button).backgroundColor;
+        button.style.outlineColor = buttonColor2;
+      });
+    });
+
+
+    //////////////////////////////////////////////////////////////////////////
+
+    // Gérer les boutons d'assise
+    const seatingButtons = document.querySelectorAll('.seating-options button');
+
+    // Initialisation des boutons d'assise au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+      seatingButtons.forEach(button => {
+        if (!button.classList.contains('active2')) {
+          button.style.color = '#9e9e9e';
+          button.style.borderColor = '#9e9e9e';
+        }
+      });
+      // Masquer "Piston" et "Métal Bois" si "Fixe" est actif par défaut
+      const pistonButton = document.getElementById('Piston');
+      const metalBoisButton = document.getElementById('Métal Bois');
+      const fixeButton = document.getElementById('Fixe');
+      if (fixeButton && fixeButton.classList.contains('active2')) {
+        pistonButton.style.display = 'none';
+        metalBoisButton.style.display = 'none';
+      }
+    });
+
+    // Gérer les clics sur les boutons d'assise
+    seatingButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        seatingButtons.forEach(btn => {
+          btn.classList.remove('active2');
+          btn.style.color = '#9e9e9e'; // Gris
+          btn.style.borderColor = '#9e9e9e'; // Gris
+        });
+
+        button.classList.add('active2');
+        button.style.color = 'black'; // Noir
+        button.style.borderColor = 'black'; // Noir
+
+        // Réglage de l'affichage du bouton "Piston" et de "Métal Bois"
+        const pistonButton = document.getElementById('Piston');
+        const metalBoisButton = document.getElementById('Métal Bois');
+        const pieds4Button = document.getElementById('4 pieds');
+        const pistonFootButton = document.getElementById('Piston');
+        if (button.id === 'Fixe') {
+          pistonButton.style.display = 'none';
+          metalBoisButton.style.display = 'none';
+          // Activer visuellement "4 pieds" et désactiver "Piston" dans la section piètement
+          pieds4Button.classList.add('active3');
+          pieds4Button.style.color = 'black';
+          pieds4Button.style.borderColor = 'black';
+          pistonFootButton.classList.remove('active3');
+          pistonFootButton.style.color = '#9e9e9e';
+          pistonFootButton.style.borderColor = '#9e9e9e';
+        } else if (button.id === 'Pivotante') {
+          pistonButton.style.display = 'block';
+          // Si le bouton "Piston" est actif, on masque "Métal Bois", sinon on l'affiche
+          if (pistonFootButton.classList.contains('active3')) {
+            metalBoisButton.style.display = 'none';
+          } else {
+            metalBoisButton.style.display = 'block';
+          }
+        }
+      });
+    });
+
+    // Gérer les boutons de piètement
+    const footingButtons = document.querySelectorAll('.footing-options button');
+
+    footingButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        footingButtons.forEach(btn => {
+          btn.classList.remove('active3');
+          btn.style.color = '#9e9e9e'; // Gris
+          btn.style.borderColor = '#9e9e9e'; // Gris
+        });
+
+        button.classList.add('active3');
+        button.style.color = 'black'; // Bleu
+        button.style.borderColor = 'black'; // Bleu
+      });
+    });
+
+    // Initialisation des boutons de piètement au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+      footingButtons.forEach(button => {
+        if (!button.classList.contains('active3')) {
+          button.style.color = '#9e9e9e';
+          button.style.borderColor = '#9e9e9e';
+        }
+      });
+    });
+
+    ////////////////////////////////////
+
+    // Sélectionne tous les boutons
+    const buttons = document.querySelectorAll('.color-options button');
+    const selectedColorElement = document.getElementById('selected-color');
+
+    // Ajoute un gestionnaire d'événements sur chaque bouton
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Récupère l'ID du bouton cliqué (nom de la couleur)
+        const colorName = button.id;
+
+        // Met à jour le texte dans <h2>
+        selectedColorElement.textContent = colorName;
+
+        // Met à jour la classe active
+        buttons.forEach(btn => btn.classList.remove('active1')); // Enlève la classe de tous les boutons
+        button.classList.add('active1'); // Ajoute la classe au bouton cliqué
+      });
+    });
+
+    ////////////////////////////////////
+
+    // Sélectionne tous les boutons
+    const buttons2 = document.querySelectorAll('.color-options2 button');
+    const selectedColorElement2 = document.getElementById('selected-color2');
+
+    // Ajoute un gestionnaire d'événements sur chaque bouton
+    buttons2.forEach(button => {
+      button.addEventListener('click', () => {
+        // Récupère l'ID du bouton cliqué (nom de la couleur)
+        const colorName = button.id;
+
+        // Met à jour le texte dans <h2>
+        selectedColorElement2.textContent = colorName;
+
+        // Met à jour la classe active
+        buttons2.forEach(btn => btn.classList.remove('active4')); // Enlève la classe de tous les boutons
+        button.classList.add('active4'); // Ajoute la classe au bouton cliqué
+      });
+    });
+
+
+    /////////////////////////////////////////////////////////////////////
+
+    // Fonction pour ajuster dynamiquement la transformation
+    function adjustCanvasOnMobile() {
+      const container = document.getElementById('v3d-container');
+      if (window.innerWidth < 769) {
+        container.style.transform = 'translateY(-12%)';
+      } else {
+        container.style.transform = ''; // Réinitialiser pour les grands écrans
+      }
+    }
+
+    // Appliquez l'ajustement au chargement et à la redimension
+    window.addEventListener('DOMContentLoaded', adjustCanvasOnMobile);
+    window.addEventListener('resize', adjustCanvasOnMobile);
+
+
+
+
+
+    const toggleButton = document.getElementById('toggle-menu');
+    const menuSections = document.getElementById('menu-sections');
+
+    // Fonction pour vérifier la taille de l'écran
+    function handleResponsiveMenu() {
+      if (window.innerWidth <= 768) {
+        toggleButton.style.display = 'block'; // Affiche le bouton sur petit écran
+        menuSections.style.maxHeight = '0px'; // Assure que le menu est fermé par défaut
+      } else {
+        toggleButton.style.display = 'none'; // Cache le bouton sur grand écran
+        menuSections.style.maxHeight = 'none'; // Réinitialise l'affichage des sections
+      }
+    }
+
+    // Appliquer les réglages au chargement et au redimensionnement
+    window.addEventListener('DOMContentLoaded', handleResponsiveMenu);
+    window.addEventListener('resize', handleResponsiveMenu);
+
+    // Gestion du clic sur le bouton avec glissement
+    toggleButton.addEventListener('click', () => {
+      if (menuSections.style.maxHeight === '0px' || !menuSections.style.maxHeight) {
+        const sectionHeight = menuSections.scrollHeight; // Calculer la hauteur complète
+        menuSections.style.maxHeight = sectionHeight + 'px'; // Définir max-height pour afficher
+        toggleButton.textContent = 'Masquer'; // Modifier le texte du bouton
+      } else {
+        menuSections.style.maxHeight = '0px'; // Réduire la hauteur pour masquer
+        toggleButton.textContent = 'Configurer'; // Modifier le texte du bouton
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const pistonButton = document.getElementById('Piston');
+      const normalButton = document.getElementById('4 pieds'); // bouton pour désactiver piston
+      const metalBoisButton = document.getElementById('Métal Bois');
+
+      // Fonction pour masquer le bouton "Métal Bois"
+      function hideMetalBois() {
+        metalBoisButton.style.display = 'none';
+      }
+
+      // Fonction pour afficher le bouton "Métal Bois"
+      function showMetalBois() {
+        metalBoisButton.style.display = 'inline-block'; // ou 'block' selon votre besoin
+      }
+
+      // Lorsque le bouton Piston est activé, on masque "Métal Bois"
+      pistonButton.addEventListener('click', function () {
+        hideMetalBois();
+      });
+
+      // Lorsque le bouton 4 pieds est activé, on réaffiche "Métal Bois" seulement si "Fixe" N'EST PAS actif
+      normalButton.addEventListener('click', function () {
+        const fixeButton = document.getElementById('Fixe');
+        if (!fixeButton.classList.contains('active2')) {
+          showMetalBois();
+        }
+        // Sinon, ne rien faire : "Métal Bois" reste caché si "Fixe" est actif
+      });
+    });
+
+
+    ///////////////////////////
+    // cacher les infos (prix/stock/reference)
+
+    function hasQueryParam(param) {
+      return new URLSearchParams(window.location.search).has(param);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (hasQueryParam("hideprice")) {
+        const sectionElement = document.querySelector(".section");
+        const priceElement = document.getElementById("add-to-cart");
+        if (sectionElement) {
+          sectionElement.style.display = "none";
+        }
+      }
+    });
+
+
+
+
+  </script>
+
+
+</body>
+
+</html>

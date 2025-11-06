@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- __V3D_PUZZLES__ - enable Puzzles button in the App Manager -->
+<html lang="en">
+
+<head>
+  <title>Allonges Pivotantes</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <!-- Search Engines -->
+  <meta name="description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Concept Table 2">
+  <meta name="twitter:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta name="twitter:image:src" content="media/home_banner_1.png">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Concept Table 2">
+  <meta property="og:description"
+    content="Spécialiste de la table et de la chaise N°1 en France de la chaise à assise rotative + de 450 distributeurs en Europe">
+  <meta property="og:image" content="media/home_banner_1.png">
+  <meta property="og:type" content="website">
+
+  <meta name="generator" content="Verge3D 4.7.1">
+
+  <!-- favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/media/180x180.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/media/48x48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/media/32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/media/16x16.png">
+  <link rel="manifest" href="media/manifest.json">
+  <link rel="mask-icon" href="media/safari-pinned-tab.svg" color="#0048a5">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="/v3d-core/v3d.js"></script>
+  <script src="Concept Table 2.js"></script>
+
+  <script>
+    window.configuratorData = {
+      // 1. Indiquer au script d'utiliser la logique pour table simple
+      logicType: 'simpleTable',
+
+      // 2. ID du produit parent unique (PIVOTANT.130)
+      parentProductId: 595, //
+
+      // 3. Map Réf (construite) -> ID Variante API
+      variantMap: {
+        "PIV.130-CB": 1414,
+        "PIV.130-CMB": 1415,
+        "PIV.130-CMN": 1440,
+        "PIV.130-CGA": 1415,
+        "PIV.130-CBB": 1439,
+        "PIV.130-CT": 1528
+        // (Basé sur Pivotante 130 API response.json)
+      },
+
+      // 4. Map Bouton Piètement ID -> ID Composant API
+      componentMap: {
+        "PT": "18", // PIEDS NOIR PIVOTANT 130
+        "PX": "24"  // PIEDS NOIR FIXE 130
+      },
+
+      // 5. Map Bouton Céramique ID -> Code Réf C
+      colorRefMap: {
+        "CB": "CB",
+        "CMB": "CMB",
+        "CMN": "CMN",
+        "CGA": "CGA",
+        "CBB": "CBB",
+        "CT": "CT"
+      }
+    };
+  </script>
+
+  <script defer src="/apiHandler.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="Concept Table 2.css">
+
+
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="media/Tablacasa-logo-header.svg" alt="Tablacasa Logo" class="logo">
+    </div>
+  </header>
+
+  <div id="v3d-container"></div>
+
+  <button class="close-container-arrow"></button>
+
+  <button class="open-container-btn">Configurer</button>
+
+  <div class="container">
+
+    <h1 id="title-product-name">Allonges Pivotantes</h1>
+
+    <!-- Version pour grand écran -->
+    <div class="desktop-version">
+
+
+      <!-- Section Ceramique (fermée par défaut) -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Céramiques</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="ceramique-grid">
+            <div id="CMB" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN" class="ceramique-item active">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB" class="ceramique-item">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+            <div id="CT" class="ceramique-item">
+              <img src="./Travertin.jpg" alt="Marbre Travertin" class="ceramique-button">
+              <p class="ceramique-text">Marbre Travertin</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Pietement -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Piètements</h2>
+          <button class="toggle-btn">+</button>
+        </div>
+        <div class="section-content collapsed">
+          <div class="pietement-grid">
+            <div id="PX" class="pietement-item">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PT" class="pietement-item active">
+              <img src="media/PT.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PT</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Version pour petit écran -->
+    <div class="mobile-version">
+      <!-- Conteneur pour les en-têtes des sections -->
+      <div class="sections-container">
+        <button class="close-section">&times;</button>
+        <div class="section-header" data-section="ceramique">
+          <h2>Céramiques</h2>
+        </div>
+        <div class="section-header" data-section="pietement">
+          <h2>Piètements</h2>
+        </div>
+      </div>
+
+      <!-- Conteneur pour les options des sections -->
+      <div class="options-container">
+        <!-- Options pour Formes -->
+
+        <!-- Options pour Ceramique -->
+        <div class="section-content" id="ceramique-content">
+          <div class="ceramique-grid">
+            <div id="CMB2" class="ceramique-item">
+              <img src="media/marbre_blanc.jpg" alt="Marbre Blanc" class="ceramique-button">
+              <p class="ceramique-text">Marbre Blanc</p>
+            </div>
+            <div id="CGA2" class="ceramique-item">
+              <img src="media/gris_acier.jpg" alt="Gris Acier" class="ceramique-button">
+              <p class="ceramique-text">Gris Acier</p>
+            </div>
+            <div id="CMN2" class="ceramique-item active">
+              <img src="media/marbre_noir.jpg" alt="Marbre Noir" class="ceramique-button">
+              <p class="ceramique-text">Marbre Noir</p>
+            </div>
+            <div id="CB2" class="ceramique-item">
+              <img src="media/bois.jpg" alt="Bois" class="ceramique-button">
+              <p class="ceramique-text">Bois</p>
+            </div>
+            <div id="CBB2" class="ceramique-item">
+              <img src="media/marbre_blanc_brillant.jpg" alt="Marbre Brillant" class="ceramique-button">
+              <p class="ceramique-text">Marbre Brillant</p>
+            </div>
+            <div id="CT2" class="ceramique-item">
+              <img src="./Travertin.jpg" alt="Marbre Travertin" class="ceramique-button">
+              <p class="ceramique-text">Marbre Travertin</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Options pour Pietement -->
+        <div class="section-content" id="pietement-content">
+          <div class="pietement-grid">
+            <div id="PX2" class="pietement-item">
+              <img src="media/PX.png" alt="PX" class="pietement-button">
+              <p class="pietement-text">PX</p>
+            </div>
+            <div id="PT2" class="pietement-item active">
+              <img src="media/PT.png" alt="PH" class="pietement-button">
+              <p class="pietement-text">PT</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Prix (toujours visible) -->
+    <div class="section">
+      <h2 style="border-bottom: 2px solid #ddd"></h2>
+      <div class="prix-container" id="prix-container">
+        <div class="prix-box">
+          <span class="prix-text" id="product-price">- €</span>
+        </div>
+        <div class="prix-details">
+          <p>eco-part : <span id="eco-part">-</span> €</p>
+          <P id="id">Ref : <span id="ref">PIV.130</span>-<span id="ref C">CMN</span>-<span id="ref P">PT</span>
+          </p>
+          <p>Conditionnement : <span id="conditionnement">..</span></p>
+          <p>Stock : <span id="stock-status">-</span></p>
+        </div>
+        <div class="prix-buttons">
+          <button class="icon-button" id="ruller-button">
+            <img src="media/ruller.svg" alt="Ruller">
+          </button>
+          <button id="table-button">Ouvrir</button>
+        </div>
+      </div>
+      <button id="add-to-cart" class="add-to-cart-button">Ajouter au panier</button>
+    </div>
+  </div>
+
+</body>
+
+<script>
+  function hasQueryParam(param) {
+    return new URLSearchParams(window.location.search).has(param);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (hasQueryParam("hideprice")) {
+      const prixBox = document.querySelector(".prix-box");
+      const prixDetails = document.querySelector(".prix-details");
+
+      if (prixBox) prixBox.style.display = "none";
+      if (prixDetails) prixDetails.style.display = "none";
+    }
+  });
+</script>
+
+</html>

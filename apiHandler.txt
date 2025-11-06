@@ -1,0 +1,617 @@
+(function () {
+    // === MAPPINGS ===
+    // Les mappings sont lus depuis 'window.configuratorData'
+    const productCache = {};
+
+    // === Fonctions d'authentification et utilitaires ===
+    async function fetchAuthToken() {
+        return new Promise((resolve, reject) => {
+            window.parent.postMessage("getToken", "*");
+            const timeout = setTimeout(() => {
+                const prixContainer = document.getElementById("prix-container");
+                if (prixContainer) prixContainer.style.display = "none";
+                reject("Timeout : aucune réponse reçue du parent");
+            }, 3000);
+
+            function handleMessage(event) {
+                clearTimeout(timeout);
+                window.removeEventListener("message", handleMessage);
+                const token = "895fabb3de16acff2a710544063813832e8f83a2"; // event.data.token;
+                console.log("Token reçu depuis React :", token);
+                localStorage.setItem("user_token", token);
+                resolve(token);
+            }
+            window.addEventListener("message", handleMessage);
+        });
+    }
+
+    function getCoefFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let coef = parseFloat(urlParams.get("coef"));
+        return isNaN(coef) ? 1 : coef;
+    }
+
+    function parseFloatSafe(v) {
+        const s = (v ?? "").toString().replace(/\s/g, "").replace(/,/, ".");
+        return parseFloat(s) || 0;
+    }
+
+    // === Fonctions pour récupérer les données de l'API ===
+    async function fetchProductData(productId, token) {
+        const PRODUCT_URL = `https://prod.tablacasa.com/warehouse/api/v1/product/${productId}/`;
+        try {
+            const response = await fetch(PRODUCT_URL, {
+                method: "GET",
+                headers: { Authorization: `Token ${token}`, Accept: "application/json" },
+            });
+            if (!response.ok) throw new Error(`Erreur récupération produit ${productId}`);
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+
+    async function preloadProduct(productId, token) {
+        const isSingleProduct = !Array.isArray(productId);
+        const addToCartBtn = document.getElementById("add-to-cart");
+
+        if (isSingleProduct && addToCartBtn) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.textContent = "Chargement...";
+        }
+
+        const TOKEN = token || await fetchAuthToken();
+        if (!TOKEN) {
+            if (isSingleProduct && addToCartBtn) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = "Ajouter au panier";
+            }
+            return;
+        }
+
+        const idsToLoad = Array.isArray(productId) ? productId : [productId];
+        for (const id of idsToLoad) {
+            if (!productCache[id]) {
+                const product = await fetchProductData(id, TOKEN);
+                if (product) {
+                    productCache[id] = product;
+                    console.log(`Produit ${id} préchargé.`);
+                }
+            }
+        }
+
+        if (isSingleProduct && addToCartBtn) {
+            addToCartBtn.disabled = false;
+            addToCartBtn.textContent = "Ajouter au panier";
+        }
+    }
+
+    // === Logique de mise à jour (Table Complexe - Concept 3 & Table Basse) ===
+    function updateTable() {
+        const { productParentMap, variantMap, formRefMap, dimRefMap, pietementRefMap } = window.configuratorData;
+        const componentMap = window.configuratorData.componentMap;
+
+        const formeEl = document.querySelector(".formes-item.active") || document.querySelector(".formes-item");
+        const dimElConcept3 = document.querySelector(".dimension-button.active") || document.querySelector(".dimension-button");
+        const isDoublePlateauConceptBasse = document.querySelector("#extra-P.active") || document.querySelector("#extra-P2.active");
+        const dimEl = dimElConcept3 || (isDoublePlateauConceptBasse ? { id: 'double' } : { id: 'simple' });
+
+        const ceramiqueEl = document.querySelector(".ceramique-item.active") || document.querySelector(".ceramique-item");
+        const pietementEl = document.querySelector(".pietement-item.active") || document.querySelector(".pietement-item");
+        const rangementActive = document.querySelector("#extra-R.active") || document.querySelector("#extra-R2.active");
+
+        const formeId = formeEl ? formeEl.id.replace('2', '') : "fleche";
+        const dimId = dimEl ? dimEl.id.replace('2', '') : "c";
+        const ceramiqueId = ceramiqueEl ? ceramiqueEl.id.replace('2', '') : "CB";
+        const pietementBaseId = pietementEl ? pietementEl.id.replace('2', '') : "PX";
+
+        const formeCode = (formRefMap && formRefMap[formeId]) ? formRefMap[formeId] : formeId;
+        const dimCode = (dimRefMap && dimRefMap[dimId]) ? dimRefMap[dimId] : dimId;
+        const ceramiqueCode = ceramiqueId;
+        const pietementBaseCode = (pietementRefMap && pietementRefMap[pietementBaseId]) ? pietementRefMap[pietementBaseId] : pietementBaseId;
+        const pietementFinalCode = pietementBaseCode + (rangementActive ? "-R" : "");
+
+        const ref1 = document.getElementById("1"); if (ref1) ref1.textContent = formeCode;
+        const ref2 = document.getElementById("2"); if (ref2) ref2.textContent = dimCode;
+        const ref3 = document.getElementById("3"); if (ref3) ref3.textContent = ceramiqueCode;
+        const ref4 = document.getElementById("4"); if (ref4) ref4.textContent = pietementBaseCode;
+        const ref5 = document.getElementById("5"); if (ref5) ref5.textContent = rangementActive ? "-R" : "";
+
+        const parentProductRef = `${formeCode}.${dimCode}`;
+        const parentProductId = productParentMap[parentProductRef];
+        if (!parentProductId) {
+            console.error("Parent Product ID non trouvé:", parentProductRef, "(Map:", productParentMap, ")");
+            setLoadingState(); return;
+        }
+        const variantSku = `${parentProductRef}-${ceramiqueCode}`;
+
+        let compId;
+        if (componentMap[dimCode] && typeof componentMap[dimCode] === 'object') {
+            compId = componentMap[dimCode][pietementBaseCode];
+        } else {
+            compId = componentMap[pietementFinalCode];
+        }
+
+        if (!compId) {
+            console.error(`ID Composant non trouvé pour dim: ${dimCode}, piet code final: ${pietementFinalCode}`, "(Map:", componentMap, ")");
+            setLoadingState(); return;
+        }
+
+        const options_choisies = `Forme: ${formeCode}, Dim/Type: ${dimCode}, Céramique: ${ceramiqueCode}, Piètement: ${pietementFinalCode}`;
+        fetchChairInfo(parentProductId, variantSku, compId, options_choisies, 'table');
+    }
+
+    // === Logique de mise à jour (Table Simple - Concept 2) ===
+    function updateSimpleTable() {
+        const { variantMap, colorRefMap, componentMap } = window.configuratorData;
+
+        const refMainEl = document.getElementById("ref");
+        const refCEl = document.getElementById("ref C");
+        const refPEl = document.getElementById("ref P");
+
+        if (!refMainEl || !refCEl || !refPEl) {
+            console.error("Éléments ref, ref C ou ref P manquants pour simpleTable.");
+            return;
+        }
+
+        const colorEl = document.querySelector(".ceramique-item.active") || document.querySelector(".ceramique-item.active1") || document.querySelector(".ceramique-item");
+        const couleurNom = colorEl ? colorEl.id.replace('2', '') : "CMN";
+        const footingActive = document.querySelector(".pietement-item.active") || document.querySelector(".pietement-item.active3") || document.querySelector(".pietement-item");
+        const footingId = footingActive ? footingActive.id.replace('2', '') : "PT";
+        const footingText = footingActive ? (footingActive.querySelector('p')?.textContent || footingId) : "PT";
+
+        const couleurRef = colorRefMap && colorRefMap[couleurNom] ? colorRefMap[couleurNom] : couleurNom;
+
+        refCEl.textContent = couleurRef;
+        refPEl.textContent = footingId; // Span P = ID HTML (PT/PX)
+
+        const refMain = refMainEl.textContent.trim();
+        const baseRef = `${refMain}-${couleurRef}`;
+        console.log("Base reference (variante):", baseRef);
+
+        const variantId = variantMap[baseRef];
+        if (!variantId) {
+            console.error("ID Variante non trouvé:", baseRef, "(Map:", variantMap, ")");
+            setLoadingState(); return;
+        }
+
+        const compCode = footingId; // Code composant = ID HTML (PT/PX)
+        const options_choisies = `Céramique: ${couleurNom}, Piètement: ${footingText}`;
+        fetchChairInfo(variantId, compCode, null, options_choisies, 'simpleTable');
+    }
+
+
+    // === Logique de mise à jour (Chaise/Tabouret/Fauteuil/Monobloc) ===
+    function updateChair() {
+        const { variantMap, logicType, colorRefMap } = window.configuratorData;
+
+        const refMainEl = document.getElementById("ref");
+        const refCEl = document.getElementById("ref C");
+        const refPEl = document.getElementById("ref P");
+
+        if (!refMainEl || !refCEl) {
+            console.error("Éléments 'ref' ou 'ref C' non trouvés.");
+            return;
+        }
+
+        let compCode = ""; // Le code LONG pour l'API (ex: PNP, SANS_ACC, AVEC_NOIR)
+        let displayCompCode = ""; // Le code COURT pour affichage via visual_logic (ex: PNP, "", -AC)
+        let options_choisies = "";
+
+        const colorButtonActive = document.querySelector(".color-options .active1") || document.querySelector(".color-options .hover1");
+        const couleurNom = colorButtonActive ? colorButtonActive.id.replace('2', '').trim() : ""; // Utilise l'ID du bouton
+        const couleurRef = colorRefMap && colorRefMap[couleurNom] ? colorRefMap[couleurNom] : (refCEl ? refCEl.textContent.trim() : "");
+
+        const refMain = refMainEl.textContent.trim();
+        const baseRef = `${refMain}-${couleurRef}`;
+        console.log("Base reference (variante):", baseRef);
+
+        const productId = variantMap[baseRef];
+        if (!productId) {
+            console.error("ID Variante non trouvé:", baseRef, "(Map:", variantMap, ")");
+            setLoadingState(); return;
+        }
+
+        const seatingOptionsExist = document.querySelector(".seating-options button");
+        const footingOptionsExist = document.querySelector(".footing-options button");
+        const isConfigurable = logicType || seatingOptionsExist || footingOptionsExist;
+
+        if (isConfigurable && !refPEl) {
+            console.warn("Élément 'ref P' non trouvé pour un produit configurable.");
+        }
+
+        // *** LOGIQUE SPÉCIFIQUE PAR TYPE ***
+        if (logicType === 'armrests') {
+            const footingActive = document.querySelector(".footing-options button.active3");
+            const armrestType = footingActive ? footingActive.id.toLowerCase() : "sans";
+            const armrestText = footingActive ? footingActive.textContent.trim() : "Sans";
+            compCode = (armrestType === "sans") ? "SANS_ACC" : "AVEC_" + couleurNom.toUpperCase();
+            displayCompCode = (armrestType === "sans") ? "" : "-AC";
+            const seatingActive = document.querySelector(".seating-options button.active2");
+            const seatText = seatingActive ? seatingActive.textContent.trim() : null;
+            options_choisies = `Couleur: ${couleurNom} | Accoudoirs: ${armrestText}`;
+            if (seatText) options_choisies += ` | Assise: ${seatText}`;
+
+        } else if (logicType === 'stool') {
+            console.log("--- updateChair STOOL ---");
+            const seatingActive = document.querySelector(".seating-options button.active2");
+            const seatType = seatingActive ? seatingActive.id.toLowerCase() : "pivotante";
+            const seatText = seatingActive ? seatingActive.textContent.trim() : "Inconnu";
+            console.log(`Seat Type: ${seatType} (Text: ${seatText})`);
+
+            const footingActive = document.querySelector(".footing-options button.active3");
+            const footingType = footingActive ? footingActive.id.toLowerCase() : "4 pieds";
+            const footingText = footingActive ? footingActive.textContent.trim() : "4 pieds";
+            console.log(`Footing Type: ${footingType} (Text: ${footingText})`);
+
+            const footingColorActive = document.querySelector(".color-options2 button.active4");
+            const footingColor = footingColorActive ? footingColorActive.id.toLowerCase() : "métal noir";
+            const footingColorText = footingColorActive ? footingColorActive.textContent.trim() : "Métal Noir";
+            console.log(`Footing Color: ${footingColor} (Text: ${footingColorText})`);
+
+
+            if (seatType === 'fixe') {
+                compCode = "PNF";
+                console.log("Calcul compCode pour 'fixe': PNF");
+            } else { // Pivotante
+                if (footingType.includes('piston')) {
+                    compCode = "PI";
+                    console.log("Calcul compCode pour 'pivotante' + 'piston': PI");
+                } else { // 4 pieds pivotant
+                    compCode = (footingColor === "métal noir") ? "PNP" : "PBP";
+                    console.log(`Calcul compCode pour 'pivotante' + '4 pieds' + couleur '${footingColor}': ${compCode}`);
+                }
+            }
+            displayCompCode = compCode;
+
+            options_choisies = `Couleur: ${couleurNom} | Assise: ${seatText} | Piètement: ${footingText}`;
+            if (!footingType.includes('piston') && seatType !== 'fixe') {
+                options_choisies += ` | Couleur Piètement: ${footingColorText}`;
+            }
+
+        } else { // Cas par défaut (chaise standard) ou monobloc
+            if (seatingOptionsExist || footingOptionsExist) { // Chaise standard
+                const seatingActive = document.querySelector(".seating-options button.active2");
+                const seatType = seatingActive ? seatingActive.id.toLowerCase() : "fixe";
+                const seatText = seatingActive ? seatingActive.textContent.trim() : "Fixe";
+                const footingActive = document.querySelector(".footing-options button.active3");
+                const footingType = footingActive ? footingActive.id.toLowerCase() : "noir";
+                const footingText = footingActive ? footingActive.textContent.trim() : "Métal noir";
+
+                compCode = (seatType === "pivotante") ? (footingType === "noir" ? "PNP" : "PBP") : (footingType === "noir" ? "PNF" : "PBF");
+                displayCompCode = compCode;
+
+                options_choisies = `Couleur: ${couleurNom} | Assise: ${seatText} | Piètement: ${footingText}`;
+
+                const refP2El = document.getElementById("ref P2");
+                if (refP2El) refP2El.textContent = '';
+
+            } else { // Monobloc
+                compCode = "";
+                displayCompCode = "";
+                options_choisies = `Couleur: ${couleurNom}`;
+                const refP2El = document.getElementById("ref P2");
+                if (refPEl) refPEl.textContent = "";
+                if (refP2El) refP2El.textContent = '';
+            }
+        }
+
+        if (refPEl) {
+            refPEl.textContent = displayCompCode;
+            console.log(`Span #ref P mis à jour avec: ${displayCompCode}`);
+        }
+
+        console.log(`Appel fetchChairInfo avec: productId=${productId}, apiCompCode=${compCode}, logicType=${logicType}`);
+        fetchChairInfo(productId, compCode, null, options_choisies, logicType);
+    }
+
+
+    /**
+     * FONCTION DE FETCH UNIVERSELLE
+     */
+    async function fetchChairInfo(productIdOrParentId, compCodeOrVariantSku, compId, options_choisies, logicType) {
+        console.log(`--- fetchChairInfo Début --- Args: ${productIdOrParentId}, ${compCodeOrVariantSku}, ${compId}, ${logicType}`);
+        const variantId = productIdOrParentId;
+        const apiCompCode = compCodeOrVariantSku;
+        const tableCompId = compId;
+
+        const { parentProductId, componentMap } = window.configuratorData;
+        let parentProduct;
+        let product;
+        let finalCompCodeForRef = apiCompCode;
+        let finalParentProductId;
+
+        // --- Logique de récupération produit/variante ---
+        if (logicType === 'table') {
+            finalParentProductId = variantId;
+            const variantSku = apiCompCode;
+            finalCompCodeForRef = tableCompId;
+
+            if (productCache[finalParentProductId]) {
+                parentProduct = productCache[finalParentProductId];
+            } else {
+                console.warn(`Cache table ${finalParentProductId} vide, re-fetch...`);
+                const TOKEN = await fetchAuthToken(); if (!TOKEN) return;
+                parentProduct = await fetchProductData(finalParentProductId, TOKEN);
+                if (parentProduct) productCache[finalParentProductId] = parentProduct;
+                else { setLoadingState(); return; }
+            }
+            if (!parentProduct || !parentProduct.variant) { setLoadingState(); return; }
+            product = parentProduct.variant.find(v => v.sku === variantSku);
+            if (!product) { console.error(`Variante ${variantSku} non trouvée.`); setLoadingState(); return; }
+
+        } else {
+            finalParentProductId = parentProductId;
+            if (productCache[finalParentProductId]) {
+                parentProduct = productCache[finalParentProductId];
+            } else {
+                console.warn(`Cache ${finalParentProductId} vide, re-fetch...`);
+                const TOKEN = await fetchAuthToken(); if (!TOKEN) return;
+                parentProduct = await fetchProductData(finalParentProductId, TOKEN);
+                if (parentProduct) productCache[finalParentProductId] = parentProduct;
+                else { setLoadingState(); return; }
+            }
+            if (!parentProduct || !parentProduct.variant) { setLoadingState(); return; }
+            product = parentProduct.variant.find(v => v.id === variantId);
+            if (!product) { console.error(`Variante ${variantId} non trouvée.`); setLoadingState(); return; }
+        }
+        console.log(`Produit parent trouvé (ID: ${finalParentProductId}), Variante trouvée (ID: ${product.id}, SKU: ${product.sku})`);
+        // --- Fin Logique récupération ---
+
+
+        // --- Logique Prix/Stock ---
+        let mainStock = 0;
+        if (product.warehouse_inventory_object?.length > 0) {
+            const entry = product.warehouse_inventory_object.find(item => (typeof item.warehouse === "object" ? item.warehouse.id === 1 : item.warehouse === 1));
+            mainStock = (entry && typeof entry.in_available_stock === 'number' && !isNaN(entry.in_available_stock)) ? entry.in_available_stock : 0;
+        } else { console.warn(`Stock principal manquant/vide pour variante ${product.id}.`); }
+
+        let apiPrice = parseFloatSafe(product.price) || 0;
+        let compStock = null;
+        let compIDExpectedNum = -1;
+
+        if (logicType === 'table') {
+            compIDExpectedNum = parseInt(tableCompId, 10);
+            if (isNaN(compIDExpectedNum)) compIDExpectedNum = -1;
+        } else if (apiCompCode) {
+            const compIDExpectedStr = componentMap ? componentMap[apiCompCode] : "";
+            console.log(`Lookup componentMap pour code '${apiCompCode}': trouvé ID string '${compIDExpectedStr}'`);
+            compIDExpectedNum = parseInt(compIDExpectedStr, 10);
+            if (isNaN(compIDExpectedNum)) {
+                console.warn(`Échec de la conversion en nombre pour ID: '${compIDExpectedStr}'`);
+                compIDExpectedNum = -1;
+            }
+        }
+        console.log(`ID Composant numérique attendu: ${compIDExpectedNum}`);
+
+        const isModular = compIDExpectedNum !== -1 && product.tariff?.length > 0;
+        console.log(`Produit considéré comme modulaire: ${isModular}`);
+
+        if (isModular) {
+            const tariffObj = product.tariff.find(item => item.component?.id === compIDExpectedNum);
+            if (tariffObj) {
+                console.log(`Tarif trouvé pour composant ${compIDExpectedNum}. Group Price: ${tariffObj.group_price}`);
+                apiPrice = parseFloatSafe(tariffObj.group_price) || 0;
+                if (tariffObj.component.warehouse_inventory_object?.length > 0) {
+                    const pedEntry = tariffObj.component.warehouse_inventory_object.find(item => (typeof item.warehouse === "object" ? item.warehouse.id === 1 : item.warehouse === 1));
+                    compStock = (pedEntry && typeof pedEntry.in_available_stock === 'number' && !isNaN(pedEntry.in_available_stock)) ? pedEntry.in_available_stock : 0;
+                    console.log(`Stock composant trouvé: ${compStock}`);
+                } else { console.warn(`Stock composant ${compIDExpectedNum} manquant/vide.`); compStock = 0; }
+            } else {
+                console.warn(`Composant ID ${compIDExpectedNum} (Code: ${apiCompCode}) non trouvé dans tariff pour variante ${product.id}. Utilisation prix variante.`);
+                compStock = 0;
+            }
+        } else {
+            compStock = mainStock;
+            console.log("Produit non modulaire ou composant invalide. Stock Composant = Stock Principal.");
+            if (compIDExpectedNum !== -1 && !product.tariff?.length > 0) console.log(`  (Raison: tariff vide)`);
+            else if (compIDExpectedNum === -1 && apiCompCode) console.log(`  (Raison: ID non trouvé pour code ${apiCompCode})`);
+            else if (!apiCompCode && logicType !== 'table') console.log(`  (Raison: Monobloc)`);
+        }
+
+        const coef = getCoefFromUrl();
+        const finalPrice = Math.round(apiPrice * coef);
+        const finalStock = (compStock !== null && !isNaN(compStock) && isModular) ? Math.min(mainStock, compStock) : mainStock;
+        console.log(`Calcul final: Prix API=${apiPrice}, Coef=${coef}, Prix Final=${finalPrice}`);
+        console.log(`Calcul final: Stock Principal=${mainStock}, Stock Comp=${compStock}, Modulaire=${isModular}, Stock Final=${finalStock}`);
+        // --- Fin Logique Prix/Stock ---
+
+
+        // --- Construction Référence Finale et Update UI ---
+        const conditionnement = product.units_per_set || 1;
+        const imageArray = product.variant_images || product.images || [];
+        const imageUrl = imageArray.length > 1 ? imageArray[1].image : (imageArray.length > 0 ? imageArray[0].image : "");
+
+        let reference;
+        if (logicType === 'table') {
+            const ref1 = document.getElementById("1")?.textContent || "";
+            const ref2 = document.getElementById("2")?.textContent || "";
+            const ref3 = document.getElementById("3")?.textContent || "";
+            const ref4 = document.getElementById("4")?.textContent || "";
+            const ref5 = document.getElementById("5")?.textContent || "";
+            reference = `${ref1}.${ref2}-${ref3}-${ref4}${ref5}`;
+        } else if (logicType === 'simpleTable') {
+            const ref1 = document.getElementById("ref")?.textContent || "";
+            const ref3 = document.getElementById("ref C")?.textContent || "";
+            const ref4 = document.getElementById("ref P")?.textContent || "";
+            reference = `${ref1}-${ref3}-${ref4}`;
+        } else {
+            reference = apiCompCode ? `${product.sku}-${apiCompCode}` : product.sku;
+        }
+        console.log("Référence complète (interne/API):", reference);
+
+        let depotId = "";
+        if (product.warehouse_inventory_object?.length > 0) {
+            const warehouseEntry = product.warehouse_inventory_object.find(w => w.in_available_stock > 0);
+            if (warehouseEntry) depotId = (typeof warehouseEntry.warehouse === 'object' ? warehouseEntry.warehouse.id : warehouseEntry.warehouse);
+        }
+
+        console.log(`Appel updateUI avec prix: ${finalPrice}, stock: ${finalStock}`);
+        updateUI(
+            finalPrice, parseFloatSafe(product.eco_part) || 0, reference, finalStock, conditionnement,
+            options_choisies, imageUrl, product.id, depotId
+        );
+    } // Fin de fetchChairInfo
+
+    /**
+     * Met à jour les éléments du DOM (commun)
+     * !! Ne met PAS à jour le texte du <p id="id"> si les spans (#ref ou #1) existent !!
+     */
+    function updateUI(price, ecoPart, reference, stock, conditionnement, options_choisies, imageUrl, productId, depotId) {
+        console.log("--- updateUI ---");
+        const productTitleEl = document.getElementById("title-product-name");
+        const productTitle = productTitleEl ? productTitleEl.textContent.trim() : "";
+
+        const priceEl = document.getElementById("price") || document.getElementById("product-price");
+        if (priceEl) {
+            priceEl.textContent = `${price} €`;
+            console.log(`Prix mis à jour à: ${price} €`);
+        } else { console.warn("Élément de prix non trouvé."); }
+
+
+        const ecoEl = document.getElementById("eco-part");
+        if (ecoEl) ecoEl.textContent = ecoPart.toFixed(2);
+
+        const conditionnementElement = document.getElementById("conditionnement");
+        if (conditionnementElement) conditionnementElement.textContent = conditionnement || 1;
+
+        const hasStock = Number(stock) > 0;
+        const messageStock = hasStock ? "En stock" : "Veuillez contacter le back office";
+        const color = hasStock ? "green" : "red";
+        const messageColor = hasStock ? "inherit" : "red";
+        const stockHTML = `
+            <span style="display:inline-flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color:${color};"></span>
+              <span id="stock-message" style="color:${messageColor};">${messageStock}</span>
+            </span>`;
+        const stockStatusEl = document.getElementById("stock-status") || document.getElementById("stock-info");
+        if (stockStatusEl) {
+            stockStatusEl.innerHTML = stockHTML;
+            console.log(`Stock mis à jour à: ${messageStock} (valeur: ${stock})`);
+        } else { console.warn("Élément de stock non trouvé."); }
+
+
+        const refCompletEl = document.getElementById("id");
+        if (refCompletEl) {
+            const spanRefExists = document.getElementById("ref") || document.getElementById("1");
+            if (!spanRefExists) {
+                refCompletEl.innerHTML = `Ref : ${reference}`;
+                console.log(`Référence <p id='id'> mise à jour (pas de spans): ${reference}`);
+            } else {
+                console.log("Référence <p id='id'> non mise à jour (spans détectés).");
+            }
+        } else { console.warn("Élément <p id='id'> non trouvé."); }
+
+        window.currentSelection = {
+            reference, quantite: 1, messageStock, conditionnement: conditionnement || 1, price: price,
+            depotId: depotId ?? "", productId: productId ?? "", productTitle: productTitle,
+            options: options_choisies, imageUrl: imageUrl,
+        };
+        console.log("window.currentSelection mis à jour:", window.currentSelection);
+    } // Fin de updateUI
+
+    /**
+     * Affiche un état de chargement initial
+     */
+    function setLoadingState() {
+        const priceEl = document.getElementById("price") || document.getElementById("product-price");
+        if (priceEl) priceEl.textContent = "- €";
+        const ecoEl = document.getElementById("eco-part");
+        if (ecoEl) ecoEl.textContent = "-";
+        const stockStatusEl = document.getElementById("stock-status") || document.getElementById("stock-info");
+        if (stockStatusEl) stockStatusEl.innerHTML = `<span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color:gray;"></span>`;
+
+        // Réinitialise SEULEMENT les spans spécifiques aux tables complexes et P2
+        // NE TOUCHE PAS à ref C et ref P initiaux
+        ["1", "2", "3", "4", "5", "ref P2"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = (id === "5" || id === "ref P2") ? "" : "-";
+        });
+    } // Fin de setLoadingState
+
+    // === Initialisation ===
+    document.addEventListener("DOMContentLoaded", async function () {
+        if (!window.configuratorData) { console.error("configuratorData manquant !"); return; }
+        const { logicType, colorRefMap = {}, productParentMap, parentProductId, variantMap } = window.configuratorData;
+
+        // Validation plus robuste
+        if (logicType === 'table') {
+            if (!productParentMap || !variantMap || !window.configuratorData.componentMap) { console.error("Config 'table' incomplète."); return; }
+        } else if (logicType === 'simpleTable') {
+            if (!parentProductId || !variantMap || !colorRefMap || !window.configuratorData.componentMap) { console.error("Config 'simpleTable' incomplète."); return; }
+        } else {
+            if (!parentProductId || !variantMap || !window.configuratorData.componentMap || !colorRefMap) { console.error("Config chaise/autre incomplète."); return; }
+        }
+
+        setLoadingState();
+
+        // Sélecteurs universels
+        const selectors = document.querySelectorAll(
+            ".formes-item, .dimension-button, .ceramique-item, .pietement-item, #extra-P, #extra-P2, #extra-R, #extra-R2, " + // Tables
+            ".seating-options button, .footing-options button, .color-options button, .color-options2 button" // Chaises/Autres
+        );
+
+        // Attache les écouteurs
+        selectors.forEach((item) => {
+            item.addEventListener("click", () => {
+                console.log(`--- Clic détecté sur: #${item.id} ---`);
+                const currentLogicType = window.configuratorData.logicType;
+                const currentConfig = window.configuratorData;
+                let updateFunction;
+
+                // Mise à jour immédiate des spans VISUELS avant l'appel API
+                if (currentLogicType === 'simpleTable') {
+                    if ((item.classList.contains("ceramique-item") || item.classList.contains("active1")) && currentConfig.colorRefMap) {
+                        const colorRef = currentConfig.colorRefMap[item.id.replace('2', '')];
+                        const refCEl = document.getElementById("ref C");
+                        if (colorRef && refCEl) refCEl.textContent = colorRef;
+                    }
+                    if (item.classList.contains("pietement-item")) {
+                        const refPEl = document.getElementById("ref P");
+                        if (refPEl) refPEl.textContent = item.id.replace('2', ''); // ID HTML
+                    }
+                    updateFunction = updateSimpleTable;
+                } else if (currentLogicType === 'table') {
+                    updateFunction = updateTable;
+                } else { // Chaises, Tabourets, Accoudoirs, Monobloc
+                    if ((item.classList.contains("hover1") || item.classList.contains("active1")) && currentConfig.colorRefMap) {
+                        const colorRef = currentConfig.colorRefMap[item.id.replace('2', '').trim()];
+                        const refCEl = document.getElementById("ref C");
+                        if (colorRef && refCEl) {
+                            refCEl.textContent = colorRef;
+                        }
+                    }
+                    updateFunction = updateChair;
+                }
+
+                if (updateFunction) {
+                    console.log(`Clic: Appel de ${updateFunction.name} dans 50ms`);
+                    setTimeout(updateFunction, 50);
+                }
+            });
+        });
+
+        // Préchargement
+        const TOKEN = await fetchAuthToken();
+        if (TOKEN) {
+            let idToPreload;
+            if (logicType === 'table' && productParentMap) {
+                idToPreload = Object.values(productParentMap);
+                console.log(`Préchargement ${idToPreload.length} produits parents (table)...`);
+            } else if (parentProductId) {
+                idToPreload = parentProductId;
+                console.log(`Préchargement produit parent ${idToPreload}...`);
+            }
+            if (idToPreload) await preloadProduct(idToPreload, TOKEN);
+        }
+
+        // Appel initial
+        console.log("--- Appel Initial ---");
+        if (logicType === 'table') updateTable();
+        else if (logicType === 'simpleTable') updateSimpleTable();
+        else updateChair();
+
+    }); // Fin de DOMContentLoaded
+
+})(); // Fin de l'IIFE

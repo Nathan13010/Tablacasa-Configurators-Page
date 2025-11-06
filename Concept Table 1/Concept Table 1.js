@@ -1,0 +1,388 @@
+/* __V3D_TEMPLATE__ - template-based file; delete this line to prevent this file from being updated */
+
+'use strict';
+
+window.addEventListener('load', e => {
+    const params = v3d.AppUtils.getPageParams();
+    createApp({
+        containerId: 'v3d-container',
+        fsButtonId: 'fullscreen-button',
+        sceneURL: params.load || 'Concept Table 1.gltf',
+        logicURL: params.logic || 'visual_logic.js',
+    });
+});
+
+async function createApp({ containerId, fsButtonId = null, sceneURL, logicURL = '' }) {
+    if (!sceneURL) {
+        console.log('No scene URL specified');
+        return;
+    }
+
+    v3d.Cache.enabled = true;
+
+    let PL = null, PE = null;
+    if (v3d.AppUtils.isXML(logicURL)) {
+        const PUZZLES_DIR = '/puzzles/';
+        const logicURLJS = logicURL.match(/(.*)\.xml$/)[1] + '.js';
+        PL = await new v3d.PuzzlesLoader().loadEditorWithLogic(PUZZLES_DIR, logicURLJS);
+        PE = v3d.PE;
+    } else if (v3d.AppUtils.isJS(logicURL)) {
+        PL = await new v3d.PuzzlesLoader().loadLogic(logicURL);
+    }
+
+    let initOptions = { useFullscreen: true };
+    if (PL) {
+        initOptions = PL.execInitPuzzles({ container: containerId }).initOptions;
+    }
+    sceneURL = initOptions.useCompAssets ? `${sceneURL}.xz` : sceneURL;
+
+    const disposeFullscreen = prepareFullscreen(containerId, fsButtonId,
+        initOptions.useFullscreen);
+    const preloader = createPreloader(containerId, initOptions, PE);
+
+    const app = createAppInstance(containerId, initOptions, preloader, PE);
+    app.addEventListener('dispose', () => disposeFullscreen && disposeFullscreen());
+
+    if (initOptions.preloaderStartCb) initOptions.preloaderStartCb();
+    app.loadScene(sceneURL, () => {
+        app.enableControls();
+        app.run();
+
+        if (PE) PE.updateAppInstance(app);
+        if (PL) PL.init(app, initOptions);
+
+        runCode(app, PL);
+    }, null, () => {
+        console.log(`Can't load the scene ${sceneURL}`);
+    });
+
+    return { app, PL };
+}
+
+function createPreloader(containerId, initOptions, PE) {
+    const preloader = initOptions.useCustomPreloader
+        ? createCustomPreloader(initOptions.preloaderProgressCb,
+            initOptions.preloaderEndCb)
+        : new v3d.SimplePreloader({ container: containerId });
+
+    if (PE) puzzlesEditorPreparePreloader(preloader, PE);
+
+    return preloader;
+}
+
+function createCustomPreloader(updateCb, finishCb) {
+    function CustomPreloader() {
+        v3d.Preloader.call(this);
+    }
+
+    CustomPreloader.prototype = Object.assign(Object.create(v3d.Preloader.prototype), {
+        onUpdate: function (percentage) {
+            v3d.Preloader.prototype.onUpdate.call(this, percentage);
+            if (updateCb) updateCb(percentage);
+        },
+        onFinish: function () {
+            v3d.Preloader.prototype.onFinish.call(this);
+            if (finishCb) finishCb();
+        }
+    });
+
+    return new CustomPreloader();
+}
+
+function puzzlesEditorPreparePreloader(preloader, PE) {
+    const _onUpdate = preloader.onUpdate.bind(preloader);
+    preloader.onUpdate = function (percentage) {
+        _onUpdate(percentage);
+        PE.loadingUpdateCb(percentage);
+    }
+
+    const _onFinish = preloader.onFinish.bind(preloader);
+    preloader.onFinish = function () {
+        _onFinish();
+        PE.loadingFinishCb();
+    }
+}
+
+function createAppInstance(containerId, initOptions, preloader, PE) {
+    const ctxSettings = {};
+    if (initOptions.useBkgTransp) ctxSettings.alpha = true;
+    if (initOptions.preserveDrawBuf) ctxSettings.preserveDrawingBuffer = true;
+
+    const app = new v3d.App(containerId, ctxSettings, preloader);
+    if (initOptions.useBkgTransp) {
+        app.clearBkgOnLoad = true;
+        if (app.renderer) {
+            app.renderer.setClearColor(0x000000, 0);
+        }
+    }
+
+    app.ExternalInterface = {};
+    prepareExternalInterface(app);
+    if (PE) PE.viewportUseAppInstance(app);
+
+    return app;
+}
+
+function prepareFullscreen(containerId, fsButtonId, useFullscreen) {
+    const container = document.getElementById(containerId);
+    const fsButton = document.getElementById(fsButtonId);
+
+    if (!fsButton) return null;
+    if (!useFullscreen) {
+        fsButton.style.display = 'none';
+        return null;
+    }
+
+    const fsEnabled = () => document.fullscreenEnabled
+        || document.webkitFullscreenEnabled
+        || document.mozFullScreenEnabled
+        || document.msFullscreenEnabled;
+    const fsElement = () => document.fullscreenElement
+        || document.webkitFullscreenElement
+        || document.mozFullScreenElement
+        || document.msFullscreenElement;
+    const requestFs = elem => (elem.requestFullscreen
+        || elem.mozRequestFullScreen
+        || elem.webkitRequestFullscreen
+        || elem.msRequestFullscreen).call(elem);
+    const exitFs = () => (document.exitFullscreen
+        || document.mozCancelFullScreen
+        || document.webkitExitFullscreen
+        || document.msExitFullscreen).call(document);
+    const changeFs = () => {
+        const elem = fsElement();
+        fsButton.classList.add(elem ? 'fullscreen-close' : 'fullscreen-open');
+        fsButton.classList.remove(elem ? 'fullscreen-open' : 'fullscreen-close');
+    };
+
+    function fsButtonClick(event) {
+        event.stopPropagation();
+        fsElement() ? exitFs() : requestFs(container);
+    }
+
+    if (fsEnabled()) fsButton.style.display = 'inline';
+
+    fsButton.addEventListener('click', fsButtonClick);
+    document.addEventListener('webkitfullscreenchange', changeFs);
+    document.addEventListener('mozfullscreenchange', changeFs);
+    document.addEventListener('msfullscreenchange', changeFs);
+    document.addEventListener('fullscreenchange', changeFs);
+
+    const disposeFullscreen = () => {
+        fsButton.removeEventListener('click', fsButtonClick);
+        document.removeEventListener('webkitfullscreenchange', changeFs);
+        document.removeEventListener('mozfullscreenchange', changeFs);
+        document.removeEventListener('msfullscreenchange', changeFs);
+        document.removeEventListener('fullscreenchange', changeFs);
+    }
+
+    return disposeFullscreen;
+}
+
+function prepareExternalInterface(app) {
+    // À personnaliser si nécessaire
+}
+
+function runCode(app, puzzles) {
+    // À personnaliser si nécessaire
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Gestion version desktop
+    const sectionHeaders = document.querySelectorAll('.desktop-version .section-header');
+    sectionHeaders.forEach(header => {
+        header.addEventListener('click', function () {
+            const toggleButton = this.querySelector('.toggle-btn');
+            const sectionContent = this.nextElementSibling;
+            sectionContent.classList.toggle('collapsed');
+            toggleButton.textContent = sectionContent.classList.contains('collapsed') ? '+' : '-';
+        });
+    });
+
+    // Gestion commune
+    const manageActiveState = (items) => {
+        items.forEach(item => {
+            item.addEventListener('click', function () {
+                items.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    };
+
+    manageActiveState(document.querySelectorAll('.dimension-button'));
+    manageActiveState(document.querySelectorAll('.formes-item'));
+    manageActiveState(document.querySelectorAll('.ceramique-item'));
+    manageActiveState(document.querySelectorAll('.pietement-item'));
+
+
+    // Gestion version mobile
+    const mobileSectionHeaders = document.querySelectorAll('.mobile-version .section-header[data-section]');
+    const v3dContainer = document.getElementById('v3d-container');
+    const mobileCloseButton = document.querySelector('.mobile-version .close-section');
+
+    if (mobileSectionHeaders.length && v3dContainer && mobileCloseButton) {
+        const isMobile = () => window.matchMedia('(max-width: 500px) and (max-height: 1000px)').matches;
+
+        const updateUI = () => {
+            const hasActive = document.querySelector('.mobile-version .section-content.active');
+            mobileCloseButton.style.display = hasActive ? 'block' : 'none';
+            if (isMobile()) {
+                v3dContainer.classList.toggle('shifted', !!hasActive);
+            }
+        };
+
+        mobileSectionHeaders.forEach(header => {
+            header.addEventListener('click', function () {
+                const sectionId = this.getAttribute('data-section');
+                const sectionContent = document.getElementById(`${sectionId}-content`);
+
+                mobileSectionHeaders.forEach(h => h.classList.remove('active'));
+                document.querySelectorAll('.mobile-version .section-content').forEach(c => c.classList.remove('active'));
+
+                if (sectionContent) {
+                    this.classList.add('active');
+                    sectionContent.classList.add('active');
+                }
+
+                updateUI();
+            });
+        });
+
+        mobileCloseButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.mobile-version .section-content').forEach(c => c.classList.remove('active'));
+            mobileSectionHeaders.forEach(h => h.classList.remove('active'));
+            updateUI();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.mobile-version .section-header') &&
+                !e.target.closest('.mobile-version .section-content')) {
+                const activeContents = document.querySelectorAll('.mobile-version .section-content.active');
+                if (activeContents.length === 0 && isMobile()) {
+                    v3dContainer.classList.remove('shifted');
+                }
+            }
+        });
+
+        updateUI();
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Code existant pour la version mobile ---
+    const mobileSectionHeaders = document.querySelectorAll('.mobile-version .section-header[data-section]');
+    const v3dContainer = document.getElementById('v3d-container');
+    const mobileCloseButton = document.querySelector('.mobile-version .close-section');
+    // (Ce bouton gère la fermeture du contenu d'une section, et votre code existant s'en charge)
+
+    // --- Nouvelle fonctionnalité : fermeture/reouverture du container UI ---
+    const container = document.querySelector('.container');
+    const closeArrow = document.querySelector('.close-container-arrow');
+    const openContainerBtn = document.querySelector('.open-container-btn');
+
+    // La flèche doit s'afficher seulement si aucune section n'est active
+    const updateArrowVisibility = () => {
+        const hasActive = document.querySelector('.mobile-version .section-content.active');
+        // Si aucune section active, affiche la flèche ; sinon, on la masque.
+        closeArrow.style.display = hasActive ? 'none' : 'block';
+    };
+
+    // Au clic sur la flèche, le container glisse vers le bas, le container 3D passe à 100vh,
+    // et le bouton "Configurer" apparaît.
+    closeArrow.addEventListener('click', () => {
+        container.classList.add('closed'); // lance l'animation de fermeture
+        // On ajuste la hauteur du conteneur 3D
+        v3dContainer.style.height = '100vh';
+        // On masque la flèche
+        closeArrow.style.display = 'none';
+        // On affiche le bouton "Configurer"
+        openContainerBtn.style.display = 'block';
+    });
+
+    // Au clic sur le bouton "Configurer", on réouvre le container
+    openContainerBtn.addEventListener('click', () => {
+        container.classList.remove('closed');
+        // Réinitialise la hauteur du conteneur 3D (la hauteur initiale est définie en CSS)
+        v3dContainer.style.height = '';
+        // Masque le bouton "Configurer"
+        openContainerBtn.style.display = 'none';
+        // Mettez à jour la visibilité de la flèche (selon le contenu actif)
+        updateArrowVisibility();
+    });
+
+    // Dans le traitement des clics sur les en-têtes mobile, ajoutez à la fin :
+    const updateUI = () => {
+        const hasActive = document.querySelector('.mobile-version .section-content.active');
+        // Gérer l'affichage de la croix (déjà présent dans votre code existant)
+        mobileCloseButton.style.display = hasActive ? 'block' : 'none';
+        // Mettre à jour la flèche : si une section est active, on masque la flèche,
+        // sinon on l'affiche (mais aussi, si le container est fermé, la flèche doit rester cachée)
+        if (container.classList.contains('closed')) {
+            closeArrow.style.display = 'none';
+        } else {
+            updateArrowVisibility();
+        }
+    };
+
+    // Ajoutez un appel à updateUI() dans vos gestionnaires d'événements mobile
+    mobileSectionHeaders.forEach(header => {
+        header.addEventListener('click', function () {
+            const sectionId = this.getAttribute('data-section');
+            const sectionContent = document.getElementById(`${sectionId}-content`);
+
+            mobileSectionHeaders.forEach(h => h.classList.remove('active'));
+            document.querySelectorAll('.mobile-version .section-content').forEach(c => c.classList.remove('active'));
+
+            if (sectionContent) {
+                this.classList.add('active');
+                sectionContent.classList.add('active');
+            }
+
+            updateUI();
+        });
+    });
+
+    mobileCloseButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.mobile-version .section-content').forEach(c => c.classList.remove('active'));
+        mobileSectionHeaders.forEach(h => h.classList.remove('active'));
+        updateUI();
+    });
+
+    // Appel initial
+    updateUI();
+});
+
+function updateArrowPosition() {
+    const container = document.querySelector('.container');
+    const arrow = document.querySelector('.close-container-arrow');
+
+    if (container && arrow) {
+        // Récupérer la position du container
+        const containerRect = container.getBoundingClientRect();
+        // Positionner la flèche 10px au-dessus du container
+        arrow.style.top = (containerRect.top - 40) + 'px';
+    }
+}
+
+// Mettez à jour la position de la flèche au chargement et lors du redimensionnement de la fenêtre
+window.addEventListener('load', updateArrowPosition);
+window.addEventListener('resize', updateArrowPosition);
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const tableButton = document.getElementById('table-button');
+    if (!tableButton) return; // Sécurité
+
+    tableButton.addEventListener('click', () => {
+        // Si le texte actuel est "fermer", on le change en "ouvrir", sinon on le change en "fermer"
+        if (tableButton.textContent.trim().toLowerCase() === 'fermer') {
+            tableButton.textContent = 'Ouvrir';
+        } else {
+            tableButton.textContent = 'Fermer';
+        }
+    });
+});
