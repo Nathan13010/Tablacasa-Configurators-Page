@@ -1,14 +1,14 @@
 /* __V3D_TEMPLATE__ - template-based file; delete this line to prevent this file from being updated */
 
 @font-face {
-  font-family: "Inter";
-  src: url("media/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('media/Inter-VariableFont_opsz,wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
 }
 
 body {
-  font-family: "Inter", Arial, sans-serif;
+  font-family: 'Inter', Arial, sans-serif;
   background-color: transparent;
   margin: 0;
   padding: 0;
@@ -37,6 +37,7 @@ body {
   height: auto;
 }
 
+
 #v3d-container {
   width: 80%;
   height: 100vh;
@@ -54,14 +55,13 @@ body {
   width: 350px;
   /* Largeur fixe */
   height: auto;
-  max-height: 95vh;
   /* Hauteur automatique */
   padding: 20px;
   background-color: #fff;
   border-radius: 24px;
-  border: 2px solid #d4d4d4;
+  border: 2px solid #D4D4D4;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  overflow-y: scroll;
+  overflow-y: auto;
   z-index: 2;
 }
 
@@ -78,11 +78,11 @@ body {
 }
 
 .fullscreen-open {
-  background-image: url("media/full-size.png");
+  background-image: url('media/full-size.png');
 }
 
 .fullscreen-close {
-  background-image: url("media/minimize.png");
+  background-image: url('media/minimize.png');
 }
 
 /* removes tap blinking on ios devices */
@@ -90,14 +90,16 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+
 .v3d-simple-preloader-logo {
-  background-image: url("media/Tablacasa%20logo.svg");
+  background-image: url('media/Tablacasa%20logo.svg');
 }
 
 .v3d-simple-preloader-container {
   --v3d-preloader-img-width: 200px;
   --v3d-preloader-img-height: 200px;
 }
+
 
 /* Styles généraux : masquez les deux versions par défaut */
 .desktop-version {
@@ -107,6 +109,7 @@ body {
 .mobile-version {
   display: none;
 }
+
 
 h1 {
   text-align: center;
@@ -234,14 +237,14 @@ h2 {
   cursor: pointer;
   transition: all 0.3s ease;
   outline: none;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 900;
   font-size: 15px;
 }
 
 /* Style du bouton actif */
 .dimension-button.active {
-  background-color: #3e3e3e;
+  background-color: #3E3E3E;
   color: white;
   opacity: 1;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -300,7 +303,7 @@ h2 {
 .image-item.active .shape-text {
   opacity: 1;
   /* Opacité à 100% */
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.50));
   /* Drop shadow qui suit les contours */
 }
 
@@ -335,36 +338,40 @@ h2 {
 }
 
 .ceramique-item {
+  width: 80px;
+  /* largeur fixe comme sur CT3 */
+  display: flex;
+  flex-direction: column;
+  /* image au-dessus, texte en-dessous */
+  align-items: center;
+  /* centrage horizontal */
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  /* Animation fluide */
 }
 
 .ceramique-button {
   width: 50px;
-  /* Taille des boutons */
-  height: 50px;
+  /* même largeur */
+  aspect-ratio: 1/1;
+  /* conserve un carré quelle que soit l’image */
+  object-fit: cover;
+  /* recadre si besoin */
   border-radius: 50%;
-  /* Boutons ronds */
-  opacity: 1;
-  /* Opacité de 100% par défaut */
   transition: all 0.3s ease;
-  /* Animation fluide */
   border: 1px solid transparent;
-  /* Bordure transparente par défaut */
 }
 
 .ceramique-text {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  font-size: 14px;
+  margin-top: 5px;
+  /* petit écart sous l’image */
+  margin-bottom: 0;
+  font-size: 10px;
+  /* taille réduite comme sur CT3 */
   color: #555;
-  opacity: 1;
-  /* Opacité de 100% par défaut */
   transition: all 0.3s ease;
-  /* Animation fluide */
 }
+
 
 /* Style du bouton et texte actif */
 .ceramique-item.active .ceramique-button {
@@ -400,6 +407,7 @@ h2 {
   transform: scale(1.05);
   /* Légère augmentation de la taille */
 }
+
 
 /* //////////////////////////////////////////////// */
 /* Styles pour la section Pietement */
@@ -507,7 +515,7 @@ h2 {
 }
 
 #table-button {
-  font-family: "Inter", Arial, sans-serif;
+  font-family: 'Inter', Arial, sans-serif;
   font-size: 15px;
   font-weight: bold;
   height: 30px;
@@ -515,8 +523,7 @@ h2 {
   background: none;
   border-radius: 4px;
   border: 1px solid #00000080;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   /* border-color: transparent; */
   border-radius: 8px;
   padding: 3px 6px;
@@ -526,8 +533,7 @@ h2 {
 
 #table-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #000000;
 }
 
@@ -535,8 +541,7 @@ h2 {
   width: 60px;
   /* Taille des icônes */
   height: 22px;
-  filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%)
-    hue-rotate(0deg) brightness(98%) contrast(89%);
+  filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
   /* Couleur #464646 */
   transition: transform 0.3s ease, filter 0.3s ease;
   /* Animation fluide */
@@ -546,13 +551,16 @@ h2 {
 .icon-button:hover img {
   transform: scale(1.1);
   /* Légère augmentation de la taille */
-  filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%)
-    hue-rotate(0deg) brightness(98%) contrast(89%)
-    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  filter: brightness(0) saturate(100%) invert(24%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   /* Légère ombre portée */
 }
 
+
 /* //////////////////////////////////////////////////////////////// */
+
+
+
+
 
 @media (max-width: 1300px) {
   #v3d-container {
@@ -574,7 +582,14 @@ h2 {
   }
 }
 
+
+
+
+
+
+
 @media (min-width: 1051px) {
+
   .close-container-arrow,
   .open-container-btn {
     display: none !important;
@@ -582,11 +597,15 @@ h2 {
 }
 
 @media (max-width: 1050px) {
+
   .close-container-arrow,
   .open-container-btn {
     display: block;
   }
 }
+
+
+
 
 /* Afficher uniquement la version desktop pour les grands écrans */
 @media (min-width: 1051px) {
@@ -601,6 +620,12 @@ h2 {
     display: block;
   }
 }
+
+
+
+
+
+
 
 .close-section {
   position: absolute;
@@ -627,10 +652,16 @@ h2 {
   }
 }
 
+
+
+
 /* /////////////////////////////////////////////////////// */
+
+
 
 /* Styles pour les petits écrans (mobile) */
 @media (max-width: 1050px) {
+
   body {
     display: flex;
     flex-direction: column;
@@ -664,7 +695,7 @@ h2 {
     padding: 10px 0;
     /* Padding vertical uniquement */
     background: white;
-    border-top: 2px solid #d4d4d4;
+    border-top: 2px solid #D4D4D4;
     border-radius: 24px 24px 0 0;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
@@ -677,15 +708,15 @@ h2 {
   }
 
   /* Pour conserver le padding interne sans affecter la largeur */
-  .container > .section,
-  .container > .mobile-version {
+  .container>.section,
+  .container>.mobile-version {
     padding-left: 0px;
     padding-right: 0px;
   }
 
   /* Ajouter une marge virtuelle pour le contenu 3D */
   #v3d-container::after {
-    content: "";
+    content: '';
     display: block;
     height: 60px;
     /* Correspond à la hauteur approximative du container */
@@ -752,6 +783,7 @@ h2 {
 
   .section-content.active {
     display: block;
+
   }
 
   /* Styles pour les options */
@@ -827,7 +859,7 @@ h2 {
 
   /* Création d’un V en utilisant un pseudo-élément */
   .close-container-arrow::before {
-    content: "";
+    content: '';
     display: block;
     width: 10px;
     height: 10px;
@@ -837,9 +869,10 @@ h2 {
     margin: 0 auto;
   }
 
+
   /* Bouton "Configurer" (initialement masqué) */
   .open-container-btn {
-    font-family: "Inter", Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -854,6 +887,8 @@ h2 {
     display: none;
     z-index: 1001;
   }
+
+
 
   /* Transition pour faire glisser le container vers le bas */
   .container {
@@ -871,6 +906,7 @@ h2 {
 }
 
 /* /////////////////////////////////////////////////// */
+
 
 /* Ajoutez ceci dans votre CSS */
 @media (max-height: 1000px) and (max-width: 500px) {
@@ -901,7 +937,7 @@ h2 {
 }
 
 /* ===== Quantité + Bouton (ligne) ===== */
-.add-to-cart-button{
+.add-to-cart-button {
   flex: 1 1 auto;
   height: 48px;
   border-radius: 10px;
@@ -911,11 +947,14 @@ h2 {
 
 
 /* Responsive: empile si pas de place */
-@media (max-width: 480px){
-  .purchase-row{
+@media (max-width: 480px) {
+  .purchase-row {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
-  .purchase-row .add-to-cart-button{ width: 100%; }
+
+  .purchase-row .add-to-cart-button {
+    width: 100%;
+  }
 }
